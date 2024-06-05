@@ -5,6 +5,8 @@ import { useState } from "react";
 import * as FileSystem from "expo-file-system";
 import transcribeAudioFromMicrophone from "../Components/Speech/audioToText";
 
+import convertTextToSpeech from "../Components/Speech/textToAudio";
+
 const AudioRecord = () => {
 	const [recording, setRecording] = useState<Recording>();
 	const [permissionResponse, requestPermission] = Audio.usePermissions();
@@ -28,6 +30,7 @@ const AudioRecord = () => {
 			// console.log("Recording started");
 			const transcription = await transcribeAudioFromMicrophone();
 			console.log(transcription);
+			convertTextToSpeech(transcription);
 		} catch (error) {
 			console.error("Failed to start recording", error);
 		}

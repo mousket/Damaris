@@ -15,6 +15,7 @@ async function transcribeAudioFromMicrophone(): Promise<string> {
 			subscriptionKey,
 			serviceRegion
 		);
+
 		const audioConfig = AudioConfig.fromDefaultMicrophoneInput();
 
 		const recognizer = new SpeechRecognizer(speechConfig, audioConfig);
