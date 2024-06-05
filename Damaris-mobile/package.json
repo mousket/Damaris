@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@azure/ai-language-conversations": "^1.0.0-beta.1",
     "@azure/openai": "^1.0.0-beta.12",
     "axios": "^1.7.2",
     "expo": "~51.0.9",
