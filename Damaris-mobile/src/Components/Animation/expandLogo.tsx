@@ -21,7 +21,7 @@ const expandLogo: React.FC = () => {
     return (
         <View>
             <Animated.Image
-                source={require('./img/interaction.png')}
+                source={require('./assets/interaction.png')}
                 style={{
                     height: interpolatedBip,
                     width: interpolatedBip,
