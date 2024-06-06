@@ -4,8 +4,8 @@ import { Button, StyleSheet, View } from "react-native";
 import { useState } from "react";
 import * as FileSystem from "expo-file-system";
 import transcribeAudioFromMicrophone from "../Components/Speech/audioToText";
-
 import convertTextToSpeech from "../Components/Speech/textToAudio";
+import analyzeUserInputForDamarisIntent from "../Components/Intent/userIntent";
 
 const AudioRecord = () => {
 	const [recording, setRecording] = useState<Recording>();
@@ -28,9 +28,15 @@ const AudioRecord = () => {
 			// );
 			// setRecording(recording);
 			// console.log("Recording started");
+
+			//This is what we will use to capture user's audio stream and transcribe it into text for analysis
 			const transcription = await transcribeAudioFromMicrophone();
-			console.log(transcription);
+
+			//This is what we will use to Give a voice to the system when it talks to the user
 			convertTextToSpeech(transcription);
+
+			//Analyzing text for intent: Shipping Itent, Tracking Intent, Shippint Info Intent etc
+			await analyzeUserInputForDamarisIntent(transcription);
 		} catch (error) {
 			console.error("Failed to start recording", error);
 		}

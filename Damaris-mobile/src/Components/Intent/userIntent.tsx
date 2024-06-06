@@ -1,18 +1,16 @@
 // Import necessary libraries (you'll need to install these via npm or yarn)
 import { ConversationAnalysisClient, AzureKeyCredential } from '@azure/ai-language-conversations';
 
-// Create a client object for Azure Conversations
-const cluEndpoint = process.env.AZURE_CONVERSATIONS_ENDPOINT || "";
-const cluKey = process.env.AZURE_CONVERSATIONS_KEY || "";
-const conversations_project_name = process.env.AZURE_CONVERSATIONS_PROJECT_NAME || "";
-const conversations_intent_deployment = process.env.AZURE_CONVERSATIONS_DEPLOYMENT_NAME || "";
-const client = new ConversationAnalysisClient(cluEndpoint, new AzureKeyCredential(cluKey ));
-
-// Example user input (replace with actual user query)
-const userInput = 'I want to track a shipment';
-
 // Analyze the user input
-async function analyzeUserInputForDamarisIntent() {
+async function analyzeUserInputForDamarisIntent(text: string) {
+    // Create a client object for Azure Conversations
+    const cluEndpoint = process.env.EXPO_PUBLIC_TEXT_ANALYTICS_ENDPOINT || "";
+    const cluKey = process.env.EXPO_PUBLIC_TEXT_ANALYTICS_API_KEY || "";
+    const conversations_project_name = process.env.EXPO_PUBLIC_AZURE_CONVERSATIONS_PROJECT_NAME || "";
+    const conversations_intent_deployment = process.env.EXPO_PUBLIC_AZURE_CONVERSATIONS_DEPLOYMENT_NAME || "";
+
+    const client = new ConversationAnalysisClient(cluEndpoint, new AzureKeyCredential(cluKey ));
+
     try {
         const result = await client.analyzeConversation({
             kind: 'Conversation',
@@ -22,7 +20,7 @@ async function analyzeUserInputForDamarisIntent() {
                     id: '1',
                     modality: 'text',
                     language: 'en',
-                    text: userInput,
+                    text: text,
                 },
                 //isLoggingEnabled: false,
             },
@@ -42,6 +40,7 @@ async function analyzeUserInputForDamarisIntent() {
             case 'ShippingIntent':
                 // Implement logic for shipping-related stages (address input, item details, etc.)
                 console.log('Handling shipping intent...');
+
                 break;
             case 'TrackingIntent':
                 // Implement logic for tracking a shipment based on the provided tracking number.
@@ -73,4 +72,4 @@ async function analyzeUserInputForDamarisIntent() {
 }
 
 // Call the function to analyze the user input
-analyzeUserInputForDamarisIntent();
+export default analyzeUserInputForDamarisIntent;
