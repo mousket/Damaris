@@ -142,7 +142,7 @@ const AudioRecord = () => {
 					style={styles.pressable}
 					onPress={recording ? stopRecording : startRecording}
 				>
-					<Animated.Image
+					<Image
 						source={require("../../assets/interaction.png")}
 						style={styles.image}
 					/>
@@ -159,7 +159,8 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	pressable: {
-		flex: 0,
+		flex: 1,
+		height: 75,
 		justifyContent: "center",
 	},
 	background: {
@@ -170,7 +171,8 @@ const styles = StyleSheet.create({
 		height: "100%",
 	},
 	image: {
-		flex: 0,
+		flex: 1,
+		height: "auto",
 		margin: "auto",
 	},
 });
