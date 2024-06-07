@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import fetchPitneyBowesBearerToken from "../bearerTokenRequest";
 
 async function getSpecialServices(
     service: string,
@@ -8,6 +9,10 @@ async function getSpecialServices(
     destinationCountryCode: string
 ): Promise<any> {
     try {
+        const bearerToken = await fetchPitneyBowesBearerToken(); // Assuming fetchPitneyBowesBearerToken returns a promise
+        const authorization = `Bearer ${bearerToken}`;
+
+
         const query = new URLSearchParams({
             service,
             parcel,
@@ -22,7 +27,7 @@ async function getSpecialServices(
                 method: 'GET',
                 headers: {
                     'X-PB-Developer-Partner-ID': 'us',
-                    Authorization: 'Bearer <YOUR_TOKEN_HERE>',
+                    Authorization: authorization,
                 },
             }
         );

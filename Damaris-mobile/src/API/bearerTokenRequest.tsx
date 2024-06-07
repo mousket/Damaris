@@ -4,8 +4,8 @@ async function fetchPitneyBowesBearerToken(): Promise<void> {
     try {
 
         //API INFO
-        const pitneyBowesApiToken = process.env.EXPO_PITNEY_BOWES_TOKEN_API || 'auth/api/v1/token';
-        const pitneyBowesApiBase = process.env.EXPO_PITNEY_BOWES_BASE_URL || 'auth/api/v1/token';
+        const pitneyBowesApiToken = process.env.EXPO_PUBLIC_PITNEY_BOWES_TOKEN_API || 'auth/api/v1/token';
+        const pitneyBowesApiBase = process.env.EXPO_PUBLIC_PITNEY_BOWES_BASE_URL || 'auth/api/v1/token';
 
         //Create Dev Credentials
         const devID = '0oa23mqyqphkRmG330h8';

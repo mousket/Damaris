@@ -118,9 +118,11 @@ function generateConsiderateSystemPrompt(userTone: string, baseRequest: string):
 async function createUserSentimentConsiderateSystemPrompt(userReplies: UserReply[], baseRequest: string): Promise<string> {
     try {
         // Initialize the OpenAI client
+        // Initialize the OpenAI client
         const openAIEndPoint = process.env.AZ_OPENAI_ENDPOINT ;
         const openAIKEY = process.env.AZ_OPENAI_KEY;
         const openAIModel = process.env.AZ_OPENAI_MODEL;
+        const openAIDeployment = process.env.EXPO_PUBLIC_AZ_OPENAI_MODEL || '';
 
         const azureOpenAIKEY =  new AzureKeyCredential(openAIKEY || "");
         const client = new OpenAIClient(openAIEndPoint || "", azureOpenAIKEY);
@@ -132,7 +134,33 @@ async function createUserSentimentConsiderateSystemPrompt(userReplies: UserReply
         const consideratePrompt = generateConsiderateSystemPrompt(userTone, baseRequest);
 
         // Generate the final response using Azure OpenAI
-        const { id, created, choices, usage } = await client.getCompletions("<deployment ID>", [consideratePrompt]);
+        const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt]);
+        const response = choices[0].text.trim();
+
+        return response;
+    } catch (error) {
+        console.error("Error generating considerate prompt:", error);
+        return "Oops, something went wrong!";
+    }
+}
+
+async function generateQNASystemReply(baseRequest: string, userTone: string): Promise<string> {
+    try {
+        // Initialize the OpenAI client
+        const openAIEndPoint = process.env.EXPO_PUBLIC_AZ_OPENAI_ENDPOINT ;
+        const openAIKEY = process.env.EXPO_PUBLIC_AZ_OPENAI_KEY;
+        const openAIDeployment = process.env.EXPO_PUBLIC_AZ_OPENAI_MODEL || '';
+
+        const azureOpenAIKEY =  new AzureKeyCredential(openAIKEY || "");
+        const client = new OpenAIClient(openAIEndPoint || "", azureOpenAIKEY);
+
+
+        // Craft the considerate prompt
+        const consideratePrompt = reformatQNASystemPrompt(userTone, baseRequest);
+
+        // Generate the final response using Azure OpenAI
+        const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt]);
+        //const { id, created, choices, usage } = await client.getCompletions("<deployment ID>", [consideratePrompt]);
         const response = choices[0].text.trim();
 
         return response;
@@ -143,6 +171,25 @@ async function createUserSentimentConsiderateSystemPrompt(userReplies: UserReply
 }
 
 
+function reformatQNASystemPrompt(userTone: string, baseRequest: string): string {
+    // Customize the considerate prompt based on user tone and base request
+    // You can add more logic here as needed
+    const prompt = `
+        You are a customer service rep from a shipping company.
+        
+        Considering that the overall tone of the customer is  $usertone,
+        generate an appropriate, succinct and customer tone sensitive message that is meant to summarize the message below .
+        
+        --------
+        $baserequest
+        ------------       
+        
+        `;
+
+    return prompt;
+}
+
+export default generateQNASystemReply;
 /*
 // Example usage:
 

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@azure/ai-language-conversations": "^1.0.0-beta.1",
+    "@azure/ai-language-text": "^1.1.0",
     "@azure/openai": "^1.0.0-beta.12",
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@expo/metro-runtime": "~3.2.1",
