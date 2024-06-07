@@ -17,11 +17,12 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import * as FileSystem from "expo-file-system";
-// import transcribeAudioFromMicrophone from "../Components/Speech/audioToText";
-// import convertTextToSpeech from "../Components/Speech/textToAudio";
-// import analyzeUserInputForDamarisIntent from "../Components/Intent/userIntent";
+import transcribeAudioFromMicrophone from "../Components/Speech/audioToText";
+import convertTextToSpeech from "../Components/Speech/textToAudio";
+import analyzeUserInputForDamarisIntent from "../Components/Intent/userIntent";
 import audioToTextFromFile from "../Components/Speech/audioToTextFromFile";
 import Animated from "react-native-reanimated";
+import getAnswersFromUserInput from "../Components/QnA/qna";
 
 const AudioRecord = () => {
 	const [recording, setRecording] = useState<Recording>();
@@ -31,7 +32,7 @@ const AudioRecord = () => {
 
 	const startRecording = async () => {
 		try {
-			if (permissionResponse?.status !== "granted") {
+		/*	if (permissionResponse?.status !== "granted") {
 				console.log("Requesting permission..");
 				await requestPermission();
 			}
@@ -71,14 +72,18 @@ const AudioRecord = () => {
 			setIsRecording(true);
 			console.log("Recording started");
 
+
+		 */
+
 			//This is what we will use to capture user's audio stream and transcribe it into text for analysis
-			// const transcription = await transcribeAudioFromMicrophone();
+			 //const transcription = await transcribeAudioFromMicrophone();
+			 const transcription = await getAnswersFromUserInput();
 
 			//This is what we will use to Give a voice to the system when it talks to the user
-			// convertTextToSpeech(transcription);
+			 //convertTextToSpeech(transcription);
 
 			//Analyzing text for intent: Shipping Itent, Tracking Intent, Shippint Info Intent etc
-			// await analyzeUserInputForDamarisIntent(transcription);
+			 //await analyzeUserInputForDamarisIntent(transcription);
 		} catch (error) {
 			console.error("Failed to start recording", error);
 		}
@@ -134,7 +139,7 @@ const AudioRecord = () => {
 
 	return (
 		<ImageBackground
-			source={require("../../assets/DamarisBackground.jpg")}
+			source={require("../../assets/BackgroundImage-2.jpg")}
 			style={styles.background}
 		>
 			<View style={styles.container}>
@@ -153,6 +158,7 @@ const AudioRecord = () => {
 	);
 };
 
+// @ts-ignore
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -169,10 +175,12 @@ const styles = StyleSheet.create({
 		resizeMode: "cover",
 		width: "100%",
 		height: "100%",
+		opacity: 1
 	},
 	image: {
-		flex: 1,
-		height: "auto",
+		flex: 0,
+		height: 175,
+		width: 175,
 		margin: "auto",
 	},
 });

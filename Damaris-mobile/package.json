@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@azure/ai-language-conversations": "^1.0.0-beta.1",
+    "@azure/ai-language-text": "^1.1.0",
     "@azure/openai": "^1.0.0-beta.12",
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@expo/metro-runtime": "~3.2.1",
@@ -21,6 +22,7 @@
     "expo-file-system": "~17.0.1",
     "expo-status-bar": "~1.12.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.36.0",
+    "node-fetch": "^3.3.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.1",
