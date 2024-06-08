@@ -1,11 +1,11 @@
-class Input extends Prompt<string> {
-    constructor(name: string, hint: string, value?: string, private mapper? : (value: string) => void) {
+class Input<T> extends Prompt<T> {
+    constructor(name: string, hint: string, value?: T, private mapper? : (value: T) => void) {
         super(name, hint, value);
         if(!!mapper)
             mapper(value!);
     }
 
-    setValue(value: string) {
+    setValue(value: T) {
         this.value = value;
         if(!!this.mapper)
             this.mapper(value);
