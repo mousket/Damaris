@@ -53,7 +53,7 @@ async function analyzeUserInputForDamarisIntent(text: string) {
                 break;
             case 'GetShippingInformation':
                 // Implement logic for getting information about shipment in general.
-                console.log('Handling tracking intent...');
+                console.log('Handling information seeking intent...');
                 await getAnswersFromQNA();
                 break;
             case 'GetShippingLabel':
@@ -61,8 +61,9 @@ async function analyzeUserInputForDamarisIntent(text: string) {
                 console.log('Handling tracking intent...');
                 break;
             case 'ShippingItemInfoIntent':
-                // Implement logic for  a shipment based on the provided tracking number.
-                console.log('Handling tracking intent...');
+                // Implement logic for  a getting information about shipping items.
+                console.log('Handling information seeking intent...');
+                await getAnswersFromQNA();
                 break;
 
             default:

@@ -2,7 +2,7 @@ import fetchPitneyBowesBearerToken from "../bearerTokenRequest";
 
 //Parameters ShipmentRequest
 //Returns a ShipmentResponse
-async function shipmenRequest(request: ShipmentRequest): Promise<void> {
+async function shipmentRequest(request: ShipmentRequest): Promise<void> {
 	const bearerToken = await fetchPitneyBowesBearerToken(); // Assuming fetchPitneyBowesBearerToken returns a promise
 	const authorization = `Bearer ${bearerToken}`;
 

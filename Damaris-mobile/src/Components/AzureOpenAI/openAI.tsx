@@ -2,7 +2,7 @@ import { AzureOpenAI } from "openai";
 import { DefaultAzureCredential, getBearerTokenProvider, InteractiveBrowserCredential } from "@azure/identity";
 
 
-/*
+
 export async function azureOpenAICompletion(request : string) {
     const scope = "https://cognitiveservices.azure.com/.default";
     //const azureADTokenProvider = getBearerTokenProvider(new DefaultAzureCredential(), scope);
@@ -76,4 +76,4 @@ function reformatSystemPrompt(userTone: string, request: string): string {
         `;
 
     return prompt;
-}*/
+}

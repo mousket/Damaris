@@ -81,5 +81,3 @@ const rate = new Rate(
 console.log(rate);
 
 */
-
-
