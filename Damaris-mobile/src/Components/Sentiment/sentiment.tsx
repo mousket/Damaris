@@ -30,9 +30,7 @@ const sentimentToTone: Record<number, string> = {
 };
 
 //List of user replies
-const userReplies = {
-
-}
+const userReplies: UserReply[] = [];
 
 interface UserReply {
     Reply: string;
@@ -81,6 +79,16 @@ async function analyzeReplySentimentWithCognitiveServices(text: string): Promise
         });
 
         const sentimentScore = response.data.documents[0].confidenceScores.positive;
+
+        const newUserReply: UserReply = {
+            Reply: text,
+            Sentiment: sentimentScore,
+        };
+
+        // Add the new UserReply to the list
+        userReplies.push(newUserReply);
+
+
         return sentimentScore;
     } catch (error) {
         console.error("Error analyzing sentiment:", error);
