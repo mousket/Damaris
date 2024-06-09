@@ -1,9 +1,7 @@
 const rateRequest = {
-    "rates": [
-        {
     "dateOfShipment": "2023-07-12",
     "fromAddress": {
-    "addressLine1": "27 Watervw Dr",
+        "addressLine1": "27 Watervw Dr",
         "addressLine2": "near abc street",
         "addressLine3": "near xyz street",
         "cityTown": "Beals",
@@ -17,7 +15,7 @@ const rateRequest = {
         "residential": false
     },
     "parcel": {
-    "height": 1,
+        "height": 1,
         "length": 2,
         "width": 1,
         "dimUnit": "IN",
@@ -25,12 +23,11 @@ const rateRequest = {
         "weight": 1
     },
     "carrierAccounts": [
-    "12prrs1"
+        "jg5Z5pgl29A"
     ],
-    "parcelType": "FRE",
-    "parcelId": "FRE",
+
     "toAddress": {
-    "addressLine1": "27 Watervw Dr",
+        "addressLine1": "27 Watervw Dr",
         "addressLine2": "near abc street",
         "addressLine3": "near xyz street",
         "cityTown": "Westford",
@@ -44,7 +41,7 @@ const rateRequest = {
         "stateProvince": "MA"
     },
     "isHazmat": false
-    };
+};
 
 
     const rateRequest1: RateRequest = {
@@ -89,5 +86,4 @@ const rateRequest = {
         residential: true,
         stateProvince: "IMPORTANT",
     },
-    }]
 };
