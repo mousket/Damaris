@@ -31,7 +31,7 @@ const AudioRecord = ({
 				</button>
 			</div>
 
-			<div className="mx-0 sm:mx-16 p-4 h-48 text-lg rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500">
+			<div className="p-4 h-48 text-lg rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500">
 				{text}
 			</div>
 		</div>
