@@ -1,5 +1,9 @@
 import axios from "axios";
 import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
+import { UserRepliesContext } from "@/main";
+import {NavigateFunction} from "react-router-dom";
+import {useContext} from "react";
+
 
 interface UserReply {
 	Reply: string;
@@ -28,31 +32,34 @@ const sentimentToTone: Record<number, string> = {
 	0.0: "Neutral",
 };
 
-//List of user replies
-const userReplies = {};
-
 interface UserReply {
 	Reply: string;
 	Sentiment: number;
 }
 
-function computeOverallSentiment(userReplies: UserReply[]): number | null {
-	if (userReplies.length === 0) {
+function computeOverallSentiment(): number | null {
+
+	const userRepliesContent = useContext(UserRepliesContext);
+
+	if (userRepliesContent?.userReplies.length === 0) {
 		return null; // No data to analyze
 	}
 
+	const userReplyList = userRepliesContent?.userReplies;
+
+	const userReplyListLength = userReplyList?.length ?? 0;
 	// Calculate the average sentiment score
-	const totalSentiment = userReplies.reduce(
+	const totalSentiment = userReplyList?.reduce(
 		(sum, reply) => sum + reply.Sentiment,
 		0
-	);
-	const overallSentiment = totalSentiment / userReplies.length;
+	) || 1;
+	const overallSentiment = totalSentiment / userReplyListLength;
 
 	return overallSentiment;
 }
 
-function getConsiderateTone(userReplies: UserReply[]): string {
-	const overallSentiment = computeOverallSentiment(userReplies);
+function getGeneralUserSentiment(): string {
+	const overallSentiment = computeOverallSentiment();
 	if (overallSentiment === null) {
 		return "Neutral"; // Default to Neutral if no data
 	}
@@ -101,9 +108,9 @@ function generateConsiderateSystemPrompt(
 	// You can add more logic here as needed
 	const prompt = `
         You are a customer service rep from a shipping company.
-        
-        Considering that the overall tone of the customer is  $usertone,
-        generate an appropriate and sensitive message that is meant to $baserequest.
+        reimagine the message below to properly engage customer feeling ` +  userTone + `,
+        --------`
+      	+  baseRequest + `
         
         Usertone: Happy
         Baserequest: Ask for your shipping address?
@@ -122,7 +129,6 @@ function generateConsiderateSystemPrompt(
 }
 
 async function createUserSentimentConsiderateSystemPrompt(
-	userReplies: UserReply[],
 	baseRequest: string
 ): Promise<string> {
 	try {
@@ -130,14 +136,14 @@ async function createUserSentimentConsiderateSystemPrompt(
 		// Initialize the OpenAI client
 		const openAIEndPoint = process.env.AZ_OPENAI_ENDPOINT;
 		const openAIKEY = process.env.AZ_OPENAI_KEY;
-		const openAIModel = process.env.AZ_OPENAI_MODEL;
+		//const openAIModel = process.env.AZ_OPENAI_MODEL;
 		const openAIDeployment = import.meta.env.VITE_AZ_OPENAI_MODEL || "";
 
 		const azureOpenAIKEY = new AzureKeyCredential(openAIKEY || "");
 		const client = new OpenAIClient(openAIEndPoint || "", azureOpenAIKEY);
 
 		// Find the user's overall tone from the sentiment analysis of the list of replies
-		const userTone = getConsiderateTone(userReplies);
+		const userTone = getGeneralUserSentiment();
 
 		// Craft the considerate prompt
 		const consideratePrompt = generateConsiderateSystemPrompt(
@@ -191,39 +197,22 @@ async function generateQNASystemReply(
 }
 
 function reformatQNASystemPrompt(
-	userTone: string,
 	baseRequest: string
 ): string {
-	// Customize the considerate prompt based on user tone and base request
-	// You can add more logic here as needed
+
+	const userTone = getGeneralUserSentiment();
 	const prompt = `
         You are a customer service rep from a shipping company.
         
-        Considering that the overall tone of the customer is  $usertone,
+        Considering that the overall tone of the customer is  ` + userTone `,
         generate an appropriate, succinct and customer tone sensitive message that is meant to summarize the message below .
         
         --------
-        $baserequest
-        ------------       
-        
+        ` + baseRequest + `
+        ------------
         `;
 
 	return prompt;
 }
 
 export default generateQNASystemReply;
-/*
-// Example usage:
-
-const userReplies: UserReply[] = [
-  { Reply: "I love this product!", Sentiment: 0.8 },
-  { Reply: "The service has been disappointing.", Sentiment: 0.2 },
-  // Add more user replies here...
-];
-
-const baseRequest = "Please assist with my order.";
-
-createUserSentimentConsiderateSystemPrompt(userReplies, baseRequest)
-  .then((result) => console.log("Considerate prompt:", result))
-  .catch((error) => console.error("Error:", error));
-*/
