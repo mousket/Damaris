@@ -23,6 +23,8 @@ import analyzeUserInputForDamarisIntent from "../Components/Intent/userIntent";
 import audioToTextFromFile from "../Components/Speech/audioToTextFromFile";
 import Animated from "react-native-reanimated";
 import getAnswersFromQNA from "../Components/QnA/qna";
+import {getSentimentScore} from "../Components/Sentiment/textSentimentAnalysis";
+import {askOpenAI, chatWithOpenAI} from "../Components/AzureOpenAI/openAI";
 
 
 const AudioRecord = () => {
@@ -82,7 +84,15 @@ const AudioRecord = () => {
 			 //Analyzing text for intent: Shipping Itent, Tracking Intent, Shipping Info Intent etc
 			//await analyzeUserInputForDamarisIntent(firstContact);
 
-			const answer = getAnswersFromQNA();
+			const sentiment = await getSentimentScore("I'm feeling pretty sad today. But I have ot keep on fighting. I don't have a choice. I must win this competition");
+			console.log(sentiment);
+
+			const openAIAnswer = await askOpenAI("man, that's rough. I just missed my delivery. What do I do now?");
+
+			//console.log(openAIAnswer);
+
+			//await chatWithOpenAI();
+			//const answer = getAnswersFromQNA();
 
 			//This is what we will use to Give a voice to the system when it talks to the user
 			 //convertTextToSpeech(transcription);

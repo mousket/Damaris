@@ -1,6 +1,6 @@
-import axios from "axios";
+import { TextAnalyticsClient, AzureKeyCredential } from "@azure/ai-text-analytics";
 
-async function getSentimentScore(text: string): Promise<number | null> {
+async function getSentimentScore(text: string) {//: Promise<number | null> {
     try {
         const apiKey = import.meta.env.VITE_TEXT_ANALYTICS_API_KEY; // Use environment variable
         const endpoint = import.meta.env.VITE_TEXT_ANALYTICS_ENDPOINT; // Use environment variable
@@ -10,30 +10,13 @@ async function getSentimentScore(text: string): Promise<number | null> {
             return null;
         }
 
-        const response = await axios.post(endpoint, { documents: [{ id: "1", text }] }, {
-            headers: {
-                "Ocp-Apim-Subscription-Key": apiKey,
-                "Content-Type": "application/json",
-            },
-        });
-        const sentimentScore = response.data.documents[0].confidenceScores.positive;
-        return sentimentScore;
+        const client = new TextAnalyticsClient(endpoint, new AzureKeyCredential(apiKey));
+        const sentimentResult = await client.analyzeSentiment([text]);
+        return sentimentResult[0].confidenceScores.positive;
+
     } catch (error) {
         console.error("Error analyzing sentiment:", error);
         return null;
     }
 }
 export default getSentimentScore;
-
-// Example usage:
-const userText = "I love this product! It's amazing.";
-
-getSentimentScore(userText)
-    .then((score) => {
-        if (score !== null) {
-            console.log(`Sentiment score: ${score}`);
-        } else {
-            console.log("Sentiment analysis failed.");
-        }
-    })
-    .catch((error) => console.error("Error:", error));

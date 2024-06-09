@@ -9,58 +9,30 @@ async function getAnswersFromQNA() {
     let userQuestion = '';
     //while (!userQuestion.toLowerCase().includes('something else') ||
     //  !userQuestion.toLowerCase().includes('no')) {
+
+        const firstPrompt = "Hi! How can I help you?";
+
+        const userTone = "in need of motivation";
+
+        const reformatMessage  = true;
+        const recreatedFirstPrompt = await azureOpenAIChat(firstPrompt, true );
+        console.log("Recreated What can I help you into:  " + recreatedFirstPrompt)
+        //await convertTextToSpeech(recreatedFirstPrompt || firstPrompt);
+
+
         // Get user input (e.g., from voice transcription)
-        const firstPrompt = "What can I help you with";
-        //const recreatedFirstPrompt = await generateQNASystemReply(firstPrompt,'sad');
-
-        const recreatedFirstPrompt = await azureOpenAICompletion(firstPrompt);
-        convertTextToSpeech(recreatedFirstPrompt);
-
-
-        // Assume you have a way to get user input (e.g., from microphone)
-        // For this example, we'll use a hardcoded question:
-
         userQuestion = await transcribeAudioFromMicrophone();
+
+
         console.log("Customer Question: " + userQuestion);
 
-        const firstAnswer = await azureOpenAICompletion(userQuestion);
+
+        const firstAnswer = await azureOpenAICompletion(userQuestion, !reformatMessage, userTone);
         console.log(firstAnswer);
 
-        const secondAnswer = await azureOpenAIChat(userQuestion);
-        console.log(secondAnswer);
-
-        return secondAnswer;
-
-        /*
-        // Submit the question to the project
-        const qnaAPIResponse = await makeQNARequest(userQuestion);
-
-        /*
-        // Display the answers
-        for (const answer of qnaAPIResponse.answers) {
-            console.log(`Answer: ${answer.answer}`);
-            console.log(`Confidence: ${answer.confidence}`);
-            console.log(`Source: ${answer.source}`);
-        }
-        */
-
-        /*
-        const qnaResponse = qnaAPIResponse.answers[0].answer;
-        console.log("QNA Response: " + qnaResponse);
-
-        const contextBasedReponse = await generateQNASystemReply(qnaResponse,'sad')
-        convertTextToSpeech(contextBasedReponse);
-        console.log("OpenAI Response:" + contextBasedReponse);
-
-        const finalSystemPrompt =  "What else can I help you with or would you like to do something";
-        const systemPrompt = await generateQNASystemReply(finalSystemPrompt,'sad');
-        convertTextToSpeech(systemPrompt);
+        return firstAnswer;
 
 
-        return qnaResponse.answers[0].answer;
-
-        */
-    //}
 }
 
 
@@ -107,5 +79,6 @@ async function makeQNARequest(userQuestion : string) {
         console.error('An error occurred:', error);
     }
 }
+
 
 export default getAnswersFromQNA;
