@@ -74,6 +74,8 @@ export async function askOpenAI(prompt: string): Promise<void> {
 	//const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt], completionsOptions);
 	//const response = choices[0].text.trim();
 	//await speechSynthesizer.speakTextAsync(response);
+    // Craft the considerate prompt
+    const consideratePrompt = await reformatSystemPrompt( "frustrated", prompt);
 
 	const responseStream = await client.streamCompletions(
 		openAIDeployment,
@@ -88,17 +90,18 @@ export async function askOpenAI(prompt: string): Promise<void> {
 			continue;
 		}
 
-		gptBuffer.push(message);
+        gptBuffer.push(message);
 
-		if (sentenceSeparators.some(separator => message.includes(separator))) {
-			const sentence = gptBuffer.join("").trim();
-			if (sentence) {
-				console.log(sentence);
-				await speechSynthesizer.speakTextAsync(sentence);
-				gptBuffer.length = 0; // Clear the buffer
-			}
-		}
-	}
+        if (sentenceSeparators.some((separator) => message.includes(separator))) {
+            const sentence = gptBuffer.join("").trim();
+            if (sentence) {
+                console.log(sentence);
+                //System Text To Speech
+                await speechSynthesizer.speakTextAsync(sentence);
+                gptBuffer.length = 0; // Clear the buffer
+            }
+        }
+    }
 }
 
 export async function chatWithOpenAI(): Promise<void> {

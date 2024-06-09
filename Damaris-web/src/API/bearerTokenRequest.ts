@@ -39,7 +39,4 @@ async function fetchPitneyBowesBearerToken(): Promise<void> {
 	}
 }
 
-// Example usage:
-//fetchPitneyBowesBearerToken();
-
 export default fetchPitneyBowesBearerToken;
