@@ -52,8 +52,9 @@ export async function askOpenAI(prompt: string): Promise<void> {
             { role: "system", content: systemMessage },
         ],
         //deploymentName: openAIDeployment,
-        maxTokens: 400,
+        maxTokens: 1,
         temperature: 0.10,
+        n: 1
     };
 
     // Craft the considerate prompt
