@@ -18,7 +18,7 @@ const AudioRecord = ({
 	};
 
 	return (
-		<div className="h-full flex flex-col justify-end content-center text-center py-8">
+		<div className="h-full min-w-[500px] flex flex-col justify-end content-center text-center py-8">
 			<div className="h-full w-full flex items-center justify-center">
 				{" "}
 				<button

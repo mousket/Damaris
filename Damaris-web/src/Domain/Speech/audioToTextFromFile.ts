@@ -7,8 +7,8 @@ import {
 
 const audioToTextFromFile = async (uri: Buffer) => {
 	try {
-		const subscriptionKey = process.env.EXPO_PUBLIC_SPEECH_SUBSCRIPTION_KEY!;
-		const serviceRegion = process.env.EXPO_PUBLIC_SPEECH_SERVICE_REGION!;
+		const subscriptionKey = import.meta.env.VITE_SPEECH_SUBSCRIPTION_KEY!;
+		const serviceRegion = import.meta.env.VITE_SPEECH_SERVICE_REGION!;
 
 		const speechConfig = SpeechConfig.fromSubscription(
 			subscriptionKey,

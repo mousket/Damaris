@@ -36,8 +36,8 @@ async function getAnswersFromUserInput(userQuesttion: string) {
 }
 
 async function makeQNARequest(userQuestion: string) {
-	const url = process.env.EXPO_PUBLIC_AZURE_QNA_URL || "";
-	const subscriptionKey = process.env.EXPO_PUBLIC_AZURE_QNA_API_KEY || "";
+	const url = import.meta.env.VITE_AZURE_QNA_URL || "";
+	const subscriptionKey = import.meta.env.VITE_AZURE_QNA_API_KEY || "";
 
 	const requestBody = {
 		top: 3,
