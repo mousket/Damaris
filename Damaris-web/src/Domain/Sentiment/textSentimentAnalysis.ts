@@ -1,13 +1,9 @@
 import axios from "axios";
-import * as dotenv from "dotenv"; // Import dotenv
-
-// Load environment variables from .env
-dotenv.config();
 
 async function getSentimentScore(text: string): Promise<number | null> {
     try {
-        const apiKey = process.env.TEXT_ANALYTICS_API_KEY; // Use environment variable
-        const endpoint = process.env.TEXT_ANALYTICS_ENDPOINT; // Use environment variable
+        const apiKey = import.meta.env.VITE_TEXT_ANALYTICS_API_KEY; // Use environment variable
+        const endpoint = import.meta.env.VITE_TEXT_ANALYTICS_ENDPOINT; // Use environment variable
 
         if (!apiKey || !endpoint) {
             console.error("API key or endpoint not provided in environment variables.");
@@ -27,7 +23,7 @@ async function getSentimentScore(text: string): Promise<number | null> {
         return null;
     }
 }
-
+export default getSentimentScore;
 
 // Example usage:
 const userText = "I love this product! It's amazing.";
