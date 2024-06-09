@@ -1,20 +1,22 @@
 import transcribeAudioFromMicrophone from "@/Domain/Speech/audioToText";
 import { useState } from "react";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 
 const AudioRecord = ({
 	handleText,
 }: {
-	handleText: (text: string) => Promise<any>;
+	handleText: (text: string, navigate: NavigateFunction) => Promise<any>;
 }) => {
 	const [isRecording, setIsRecording] = useState(false);
 	const [text, setText] = useState("");
+	const navigate = useNavigate();
 
 	const record = async () => {
 		setIsRecording(true);
 		const recognizedText = await transcribeAudioFromMicrophone();
 		setText(recognizedText);
 		setIsRecording(false);
-		await handleText(text);
+		await handleText(text, navigate);
 	};
 
 	return (

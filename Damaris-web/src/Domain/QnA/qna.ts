@@ -1,9 +1,13 @@
 import transcribeAudioFromMicrophone from "../Speech/audioToText";
 import convertTextToSpeech from "../Speech/textToAudio";
 import generateQNASystemReply from "../Sentiment/sentiment";
+import { NavigateFunction } from "react-router-dom";
 
 // Function to get answers based on user input
-async function getAnswersFromUserInput(userQuesttion: string) {
+async function getAnswersFromUserInput(
+	userQuesttion: string,
+	navigate: NavigateFunction
+) {
 	let question = "";
 	while (!question.toLowerCase().includes("something else")) {
 		// Get user input (e.g., from voice transcription)

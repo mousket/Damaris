@@ -3,9 +3,13 @@ import {
 	ConversationAnalysisClient,
 	AzureKeyCredential,
 } from "@azure/ai-language-conversations";
+import { NavigateFunction } from "react-router-dom";
 
 // Analyze the user input
-async function analyzeUserInputForDamarisIntent(text: string) {
+async function analyzeUserInputForDamarisIntent(
+	text: string,
+	navigate: NavigateFunction
+) {
 	// Create a client object for Azure Conversations
 	const cluEndpoint = import.meta.env.VITE_TEXT_ANALYTICS_ENDPOINT || "";
 	const cluKey = import.meta.env.VITE_TEXT_ANALYTICS_API_KEY || "";
@@ -18,8 +22,6 @@ async function analyzeUserInputForDamarisIntent(text: string) {
 		cluEndpoint,
 		new AzureKeyCredential(cluKey)
 	);
-
-	console.log(text);
 
 	try {
 		const result = await client.analyzeConversation({
@@ -50,7 +52,7 @@ async function analyzeUserInputForDamarisIntent(text: string) {
 			case "ShippingIntent":
 				// Implement logic for shipping-related stages (address input, item details, etc.)
 				console.log("Handling shipping intent...");
-
+				navigate("/audioshipping");
 				break;
 			case "TrackingIntent":
 				// Implement logic for tracking a shipment based on the provided tracking number.
