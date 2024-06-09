@@ -87,7 +87,9 @@ const AudioRecord = () => {
 			const sentiment = await getSentimentScore("I'm feeling pretty sad today. But I have ot keep on fighting. I don't have a choice. I must win this competition");
 			console.log(sentiment);
 
-			const openAIAnswer = await askOpenAI("man, that's rough. I just missed my delivery. What do I do now?");
+			const query = await transcribeAudioFromMicrophone();
+
+			const openAIAnswer = await askOpenAI(query);
 
 			//console.log(openAIAnswer);
 
