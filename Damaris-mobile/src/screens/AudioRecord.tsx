@@ -25,6 +25,7 @@ import Animated from "react-native-reanimated";
 import getAnswersFromQNA from "../Components/QnA/qna";
 import {getSentimentScore} from "../Components/Sentiment/textSentimentAnalysis";
 import {askOpenAI, chatWithOpenAI} from "../Components/AzureOpenAI/openAI";
+import customEntityExtraction from "../Components/CustomEntityExtraction/customeEntityExtraction";
 
 
 const AudioRecord = () => {
@@ -88,6 +89,7 @@ const AudioRecord = () => {
 			console.log(sentiment);
 
 			const query = await transcribeAudioFromMicrophone();
+			const entity = await customEntityExtraction(query);
 
 			const openAIAnswer = await askOpenAI(query);
 
