@@ -2,12 +2,11 @@
 import transcribeAudioFromMicrophone from "../Speech/audioToText";
 import convertTextToSpeech from "../Speech/textToAudio";
 */
-import { azureOpenAICompletion} from "../AzureOpenAI/openAI";
-
+import { azureOpenAICompletion } from "../AzureOpenAI/openAI";
 
 // Function to get answers based on user input
 async function getAnswersFromQNA() {
-	let userQuestion = '';
+	let userQuestion = "";
 	//while (!userQuestion.toLowerCase().includes('something else') ||
 	//  !userQuestion.toLowerCase().includes('no')) {
 
@@ -15,30 +14,34 @@ async function getAnswersFromQNA() {
 
 	const userTone = "in need of motivation";
 
-	const reformatMessage  = true;
-	const recreatedFirstPrompt = await azureOpenAICompletion(userTone, true, firstPrompt);
-	console.log("Recreated What can I help you into:  " + recreatedFirstPrompt)
+	const reformatMessage = true;
+	const recreatedFirstPrompt = await azureOpenAICompletion(
+		userTone,
+		true,
+		firstPrompt
+	);
+	console.log("Recreated What can I help you into:  " + recreatedFirstPrompt);
 	//await convertTextToSpeech(recreatedFirstPrompt || firstPrompt);
-
 
 	// Get user input (e.g., from voice transcription)
 	//userQuestion = await transcribeAudioFromMicrophone();
 	userQuestion = "How can I change the delivery date for my shipment";
 	console.log("Customer Question: " + userQuestion);
 
-
-	const firstAnswer = await azureOpenAICompletion(userTone, !reformatMessage, userQuestion || 'Can I change the delivery for my shipment package.');
+	const firstAnswer = await azureOpenAICompletion(
+		userTone,
+		!reformatMessage,
+		userQuestion || "Can I change the delivery for my shipment package."
+	);
 	console.log(firstAnswer);
 
 	return firstAnswer;
-
-
 }
 
 /*
 async function makeQNARequest(userQuestion : string) {
-	const url = process.env.EXPO_PUBLIC_AZURE_QNA_URL || ''
-	const subscriptionKey = process.env.EXPO_PUBLIC_AZURE_QNA_API_KEY || '';
+	const url = import.meta.env.VITE_AZURE_QNA_URL || ''
+	const subscriptionKey = import.meta.env.VITE_AZURE_QNA_API_KEY || '';
 
 	const requestBody = {
 		top: 3,
