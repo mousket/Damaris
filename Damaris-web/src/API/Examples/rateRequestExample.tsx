@@ -1,4 +1,4 @@
-const rateRequest = {
+const rateRequestExample = {
     "dateOfShipment": "2023-07-12",
     "fromAddress": {
         "addressLine1": "27 Watervw Dr",
@@ -44,7 +44,7 @@ const rateRequest = {
 };
 
 
-    const rateRequest1: RateRequest = {
+const rateRequestSecondExample: RateRequest = {
     dateOfShipment: "2023-07-12",
     fromAddress: {
         addressLine1: "27 Watervw Dr",
@@ -61,9 +61,9 @@ const rateRequest = {
         residential: false,
     },
     parcel: {
-        height: "IMPORTANT",
-        length: "IMPORTANT",
-        width: "IMPORTANT",
+        height: 0,
+        length: 0,
+        width: 0,
         dimUnit: "IMPORTANT",
         weightUnit: "IMPORTANT",
         weight: 100000,
@@ -87,3 +87,4 @@ const rateRequest = {
         stateProvince: "IMPORTANT",
     },
 };
+console.log(rateRequestSecondExample.carrierAccounts)

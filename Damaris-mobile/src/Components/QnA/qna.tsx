@@ -1,84 +1,35 @@
 import transcribeAudioFromMicrophone from "../Speech/audioToText";
 import convertTextToSpeech from "../Speech/textToAudio";
-import generateQNASystemReply from "../Sentiment/sentiment";
-import {azureOpenAIChat, azureOpenAICompletion} from "../AzureOpenAI/openAI";
+import { openAICall} from "../AzureOpenAI/openAI";
 
 
 // Function to get answers based on user input
-async function getAnswersFromQNA() {
-    let userQuestion = '';
-    //while (!userQuestion.toLowerCase().includes('something else') ||
-    //  !userQuestion.toLowerCase().includes('no')) {
+export async function getAnswersFromQNA() {
+    const openingMessage = "Hi! How can I help you?";
+    const recreatedFirstPrompt = await openAICall(openingMessage, false);
+    console.log("Recreated What can I help you into:  " + recreatedFirstPrompt)
 
-        const firstPrompt = "Hi! How can I help you?";
+    //System speaks the recreated opening message
+    await convertTextToSpeech(recreatedFirstPrompt);
 
-        const userTone = "in need of motivation";
+    // Get user input (e.g., from voice transcription)
+    let userQuestion = await transcribeAudioFromMicrophone();
+    while (
+        !userQuestion.toLowerCase().includes('error') ||
+        !userQuestion.toLowerCase().includes('no speech detected') ||
+        !userQuestion.toLowerCase().includes('something else') ||
+          !userQuestion.toLowerCase().includes('no')) {
 
-        const reformatMessage  = true;
-        const recreatedFirstPrompt = await azureOpenAIChat(firstPrompt, true );
-        console.log("Recreated What can I help you into:  " + recreatedFirstPrompt)
-        //await convertTextToSpeech(recreatedFirstPrompt || firstPrompt);
+        console.log("Customer Reply: " + userQuestion);
 
+        //System replies to the customer message
+        const firstAnswer = await openAICall(userQuestion, true);
+        console.log("Damaris Reply: " + firstAnswer);
 
-        // Get user input (e.g., from voice transcription)
+        // User responds to message or ask another question
         userQuestion = await transcribeAudioFromMicrophone();
-
-
-        console.log("Customer Question: " + userQuestion);
-
-
-        const firstAnswer = await azureOpenAICompletion(userQuestion, !reformatMessage, userTone);
-        console.log(firstAnswer);
-
-        return firstAnswer;
-
-
-}
-
-
-async function makeQNARequest(userQuestion : string) {
-    const url = process.env.EXPO_PUBLIC_AZURE_QNA_URL || ''
-    const subscriptionKey = process.env.EXPO_PUBLIC_AZURE_QNA_API_KEY || '';
-
-    const requestBody = {
-        top: 3,
-        question: userQuestion,
-        includeUnstructuredSources: true,
-        confidenceScoreThreshold: '0.6',
-        answerSpanRequest: {
-            enable: true,
-            topAnswersWithSpan: 1,
-            confidenceScoreThreshold: '0.7',
-        },
-        filters: {
-            metadataFilter: {
-                logicalOperation: 'AND',
-
-            },
-        },
-    };
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Ocp-Apim-Subscription-Key': subscriptionKey,
-            },
-            body: JSON.stringify(requestBody),
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Response:', data);
-            return data;
-        } else {
-            console.error('Error:', response.statusText);
-        }
-    } catch (error) {
-        console.error('An error occurred:', error);
     }
 }
 
 
-export default getAnswersFromQNA;
+

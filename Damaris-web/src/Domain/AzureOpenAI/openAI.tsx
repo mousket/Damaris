@@ -14,6 +14,8 @@ import {
 	CancellationDetails,
 } from "microsoft-cognitiveservices-speech-sdk";
 
+import {getGeneralUserSentiment, reformatQnaMessage, reformatSystemMessage} from "../Sentiment/sentiment"
+
 // Initialize the OpenAI client
 const openAIEndPoint = import.meta.env.VITE_AZ_OPENAI_ENDPOINT || "";
 const openAIKEY = import.meta.env.VITE_AZ_OPENAI_KEY || "";
@@ -67,8 +69,7 @@ export async function askOpenAI(prompt: string): Promise<void> {
 	};
 
 	// Craft the considerate prompt
-	const consideratePrompt = await reformatSystemPrompt("frustrated", prompt);
-	//console.log("New prompt to customer: " + consideratePrompt);
+	const consideratePrompt = await reformatSystemPrompt(prompt);
 
 	const responseStream = await client.streamCompletions(
 		openAIDeployment,
@@ -94,6 +95,7 @@ export async function askOpenAI(prompt: string): Promise<void> {
                 gptBuffer.length = 0; // Clear the buffer
             }
         }
+		break;
     }
 }
 
@@ -141,33 +143,50 @@ export async function chatWithOpenAI(): Promise<void> {
 	}
 }
 
-//To answer question from the user
-function reformatSystemPrompt(userTone: string, request: string): string {
-	// Customize the considerate prompt based on user tone and base request
-	// You can add more logic here as needed
-	const prompt =
-		`        
-        Answer the question below as shortly as you can and modify your language to accomodate a customer be mindful of a who is feeling` +
-		userTone +
-		`.` +
-		` 
-        --------
-        ` +
-		request +
-		`
-        ------------ 
-        `;
 
-	return prompt;
-}
+//Parameters: request to send to open ai
+//parameters  isQna boolean
+export async function openAICall(request: string, isQna: boolean): Promise<string> {
+	// Initialize your speech configuration (if needed)
+	const speechConfig = SpeechConfig.fromSubscription(speechKey, speechRegion);
 
-/* to improve System Replies and questions to the user.
-function reformatQNAPrompt(userTone: string, request: string): string {
-    const prompt = `        
-        recreate the message below to engage a customer who is` +  userTone + `.` +  `
-        --------
-        ` + request + `
-        ------------  `;
-    return prompt;
+	// Initialize your OpenAI client
+	const client = new OpenAIClient(
+		openAIEndPoint,
+		new AzureKeyCredential(openAIKEY)
+	);
+
+	// Configure completions options
+	const completionsOptions: GetChatCompletionsOptions = {
+		messages: [
+			{ role: "system", content: systemMessage },
+			{ role: "user", content: request }
+		],
+		maxTokens: 120,
+		temperature: 0.9,
+	};
+	const consideratePrompt = (isQna) ? reformatQnaMessage(prompt) : reformatSystemMessage(prompt);
+
+	let result = "";
+	/* A different way of getting the open AI data
+	// Generate the final response using Azure OpenAI
+	const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt]);
+	//const { id, created, choices, usage } = await azureClient.completions({ prompt, model: openAIDeployment, max_tokens: 128});
+	result = choices[0].text.trim();
+	*/
+
+	// Get the response stream
+	const responseStream = await client.streamCompletions(
+		openAIDeployment,
+		[consideratePrompt],
+		completionsOptions
+	);
+
+	// Capture the first response
+	for await (const response of responseStream) {
+		result = response.choices[0].text;
+		break; // Exit the loop after the first response
+	}
+
+	return response;
 }
-*/

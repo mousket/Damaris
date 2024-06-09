@@ -1,76 +1,86 @@
-import {AzureKeyCredential, OpenAIClient, GetChatCompletionsOptions} from "@azure/openai";
+//@ts-nocheck
+import {
+    AzureKeyCredential,
+    OpenAIClient,
+    GetChatCompletionsOptions,
+} from "@azure/openai";
 import {
     AudioConfig,
     SpeechConfig,
     SpeechRecognizer,
     ResultReason,
-    SpeechSynthesizer, CancellationReason, CancellationDetails,
+    SpeechSynthesizer,
+    CancellationReason,
+    CancellationDetails,
 } from "microsoft-cognitiveservices-speech-sdk";
 
-import { getGeneralUserSentiment } from "../Sentiment/sentiment";
 
+import {getGeneralUserSentiment, reformatSystemMessage} from "../Sentiment/sentiment"
 
 // Initialize the OpenAI client
-const openAIEndPoint = process.env.EXPO_PUBLIC_AZ_OPENAI_ENDPOINT || '';
-const openAIKEY = process.env.EXPO_PUBLIC_AZ_OPENAI_KEY || '';
-const openAIDeployment = process.env.EXPO_PUBLIC_AZ_OPENAI_MODEL || '';
+const openAIEndPoint = import.meta.env.VITE_AZ_OPENAI_ENDPOINT || "";
+const openAIKEY = import.meta.env.VITE_AZ_OPENAI_KEY || "";
+const openAIDeployment = import.meta.env.VITE_AZ_OPENAI_MODEL || "";
 
-const speechKey = process.env.EXPO_PUBLIC_SPEECH_SUBSCRIPTION_KEY || '';
-const speechRegion = process.env.EXPO_PUBLIC_SPEECH_SERVICE_REGION || '';
+const speechKey = import.meta.env.VITE_SPEECH_SUBSCRIPTION_KEY || "";
+const speechRegion = import.meta.env.VITE_SPEECH_SERVICE_REGION || "";
 
-const azureOpenAIKEY =  new AzureKeyCredential(openAIKEY ) || '';
-const client = new OpenAIClient(openAIEndPoint, azureOpenAIKEY) || '';
+const sentenceSeparators: string[] = [
+    ".",
+    "!",
+    "?",
+    ";",
+    "。",
+    "！",
+    "？",
+    "；",
+    "\n",
+];
 
-const sentenceSeparators: string[] = [".", "!", "?", ";", "。", "！", "？", "；", "\n"];
-
-const systemMessage = "Hello! I'm your friendly shipping assistant. How can I help you today? Just type your question," +
+const systemMessage =
+    "Hello! I'm your friendly shipping assistant. How can I help you today? Just type your question," +
     " and I'll do my best to provide a quick and accurate answer. If I don't know something," +
     "1. **Summaries**: I'll provide concise answers and summaries—no long-winded speeches here!\n" +
     "2. **Eager to Help**: Ask me anything, from tracking packages to shipping rates. I'm all ears (well, virtually) and ready to assist.\n" +
-    "3. **Listening Mode**: Got more questions? Fire away! I'm here to listen and learn."
-    " Remember, I'm not just a robot; I'm a shipping enthusiast with a dash of humor. " +
-    "I promise I won't make up stories—I'll just admit it and maybe crack a joke. Let's sail through this together!";
-
+    "3. **Listening Mode**: Got more questions? Fire away! I'm here to listen and learn.";
+" Remember, I'm not just a robot; I'm a shipping enthusiast with a dash of humor. " +
+"I promise I won't make up stories—I'll just admit it and maybe crack a joke. Let's sail through this together!";
 
 export async function askOpenAI(prompt: string): Promise<void> {
-    const consoleLock: any = {}; // TypeScript equivalent of 'object'
     const speechConfig = SpeechConfig.fromSubscription(speechKey, speechRegion);
 
     // The language of the voice that speaks.
     speechConfig.speechSynthesisVoiceName = "en-US-JennyMultilingualNeural";
     const audioOutputConfig = AudioConfig.fromDefaultSpeakerOutput();
-    const speechSynthesizer = new SpeechSynthesizer(speechConfig, audioOutputConfig)
-
-    speechSynthesizer.synthesizing = (sender, args) => {
-        console.log("[Audio]"); // Replace with your actual audio handling logic
-    };
+    const speechSynthesizer = new SpeechSynthesizer(
+        speechConfig,
+        audioOutputConfig
+    );
 
     // Ask Azure OpenAI
-    const client = new OpenAIClient(openAIEndPoint, new AzureKeyCredential(openAIKEY));
+    const client = new OpenAIClient(
+        openAIEndPoint,
+        new AzureKeyCredential(openAIKEY)
+    );
     const completionsOptions: GetChatCompletionsOptions = {
-        messages: [
-            { role: "system", content: systemMessage },
+        messages: [{ role: "system", content: systemMessage },
+            {role: "user", content: request}
         ],
         //deploymentName: openAIDeployment,
-        maxTokens: 1,
-        temperature: 0.10,
-        n: 1
+        maxTokens: 400,
+        temperature: 0.1,
     };
 
     // Craft the considerate prompt
-    const consideratePrompt = await reformatSystemPrompt( "frustrated", prompt);
-    //console.log("New prompt to customer: " + consideratePrompt);
+    const consideratePrompt = await reformatSystemPrompt(prompt);
 
-    // Generate the final response using Azure OpenAI
-    const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt], completionsOptions);
-    const response = choices[0].text.trim();
-    await speechSynthesizer.speakTextAsync(response);
-
-
-    const responseStream = await client.streamCompletions(openAIDeployment, [consideratePrompt],  completionsOptions);
+    const responseStream = await client.streamCompletions(
+        openAIDeployment,
+        [consideratePrompt],
+        completionsOptions
+    );
     const gptBuffer: string[] = [];
 
-    let openAIReply = "";
     for await (const completionUpdate of responseStream) {
         const message = completionUpdate.choices[0]?.text;
         if (!message) {
@@ -83,15 +93,14 @@ export async function askOpenAI(prompt: string): Promise<void> {
             const sentence = gptBuffer.join("").trim();
             if (sentence) {
                 console.log(sentence);
+                //System Text To Speech
                 await speechSynthesizer.speakTextAsync(sentence);
-                openAIReply = sentence;
                 gptBuffer.length = 0; // Clear the buffer
             }
         }
+        break;
     }
-
 }
-
 
 export async function chatWithOpenAI(): Promise<void> {
     const speechConfig = SpeechConfig.fromSubscription(speechKey, speechRegion);
@@ -102,7 +111,9 @@ export async function chatWithOpenAI(): Promise<void> {
     let conversationEnded = false;
 
     while (!conversationEnded) {
-        console.log("Azure OpenAI is listening. Say 'Stop' or press Ctrl-Z to end the conversation.");
+        console.log(
+            "Azure OpenAI is listening. Say 'Stop' or press Ctrl-Z to end the conversation."
+        );
         // Get audio from the microphone and then send it to the TTS service.
         try {
             const result = await speechRecognizer.recognizeOnceAsync();
@@ -121,44 +132,56 @@ export async function chatWithOpenAI(): Promise<void> {
                     break;
                 case ResultReason.Canceled:
                     const cancellationDetails = CancellationDetails.fromResult(result);
-                    console.log(`Speech Recognition canceled: ${cancellationDetails.reason}`);
+                    console.log(
+                        `Speech Recognition canceled: ${cancellationDetails.reason}`
+                    );
                     if (cancellationDetails.reason === CancellationReason.Error) {
                         console.log(`Error details: ${cancellationDetails.errorDetails}`);
                     }
                     break;
             }
-        }catch (error)
-        {
+        } catch (error) {
             console.error("Error during speech recognition:", error);
         }
     }
-
-
 }
 
+export async function openAICall(request: string, isQna: boolean): Promise<string> {
+    // Initialize your speech configuration (if needed)
+    const speechConfig = SpeechConfig.fromSubscription(speechKey, speechRegion);
 
-function reformatSystemPrompt(userTone: string, request: string): string {
-    // Customize the considerate prompt based on user tone and base request
-    // You can add more logic here as needed
-    const prompt = `        
-        Answer the question below as shortly as you can and be considerate of your customer who is feeling` + userTone + `.` +
-        ` 
-        --------
-        ` + request + `
-        ------------ 
-        `;
+    // Initialize your OpenAI client
+    const client = new OpenAIClient(
+        openAIEndPoint,
+        new AzureKeyCredential(openAIKEY)
+    );
 
-    return prompt;
-}
+    // Configure completions options
+    const completionsOptions: GetChatCompletionsOptions = {
+        messages: [
+            { role: "system", content: systemMessage },
+            { role: "user", content: request }
+        ],
+        maxTokens: 120,
+        temperature: 0.9,
+    };
 
+    // Craft the considerate prompt (reformatSystemPrompt(prompt) should be defined elsewhere)
+    const consideratePrompt = (isQna) ? reformatQnaMessage(prompt) : reformatSystemMessage(prompt);
 
-function reformatQNAPrompt(request: string): string {
-    const userTone = getGeneralUserSentiment();
+    // Get the response stream
+    const responseStream = await client.streamCompletions(
+        openAIDeployment,
+        [consideratePrompt],
+        completionsOptions
+    );
 
-    const prompt = `        
-        recreate the message below to engage your customer who is` +  userTone + `.` +  `        
-        --------
-        ` + request + `
-        ------------  `;
-    return prompt;
+    // Capture the first response
+    let result = "";
+    for await (const response of responseStream) {
+        result = response.choices[0].text;
+        break; // Exit the loop after the first response
+    }
+
+    return result;
 }
