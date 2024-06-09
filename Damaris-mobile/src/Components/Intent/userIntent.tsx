@@ -1,5 +1,6 @@
 // Import necessary libraries (you'll need to install these via npm or yarn)
 import { ConversationAnalysisClient, AzureKeyCredential } from '@azure/ai-language-conversations';
+import getAnswersFromQNA from "../QnA/qna";
 
 // Analyze the user input
 async function analyzeUserInputForDamarisIntent(text: string) {
@@ -52,15 +53,17 @@ async function analyzeUserInputForDamarisIntent(text: string) {
                 break;
             case 'GetShippingInformation':
                 // Implement logic for getting information about shipment in general.
-                console.log('Handling tracking intent...');
+                console.log('Handling information seeking intent...');
+                await getAnswersFromQNA();
                 break;
             case 'GetShippingLabel':
                 // Implement logic for getting a shipping label for a shipment.
                 console.log('Handling tracking intent...');
                 break;
             case 'ShippingItemInfoIntent':
-                // Implement logic for  a shipment based on the provided tracking number.
-                console.log('Handling tracking intent...');
+                // Implement logic for  a getting information about shipping items.
+                console.log('Handling information seeking intent...');
+                await getAnswersFromQNA();
                 break;
 
             default:

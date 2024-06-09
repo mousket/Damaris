@@ -1,85 +1,83 @@
+/*
 import transcribeAudioFromMicrophone from "../Speech/audioToText";
 import convertTextToSpeech from "../Speech/textToAudio";
-import generateQNASystemReply from "../Sentiment/sentiment";
-import { NavigateFunction } from "react-router-dom";
+*/
+import { azureOpenAICompletion} from "../AzureOpenAI/openAI";
+
 
 // Function to get answers based on user input
-async function getAnswersFromUserInput(
-	userQuesttion: string,
-	navigate: NavigateFunction
-) {
-	let question = "";
-	while (!question.toLowerCase().includes("something else")) {
-		// Get user input (e.g., from voice transcription)
-		console.log("What is your question?");
+async function getAnswersFromQNA() {
+	let userQuestion = '';
+	//while (!userQuestion.toLowerCase().includes('something else') ||
+	//  !userQuestion.toLowerCase().includes('no')) {
 
-		// Assume you have a way to get user input (e.g., from microphone)
-		// For this example, we'll use a hardcoded question:
-		//question = await transcribeAudioFromMicrophone();
-		question = "when will my package arrive?";
+	const firstPrompt = "HI! How can I help you?";
 
-		// Submit the question to the project
-		const qnaAPIResponse = await makeQNARequest(question);
+	const userTone = "in need of motivation";
 
-		// Display the answers
-		for (const answer of qnaAPIResponse.answers) {
-			console.log(`Answer: ${answer.answer}`);
-			console.log(`Confidence: ${answer.confidence}`);
-			console.log(`Source: ${answer.source}`);
-		}
+	const reformatMessage  = true;
+	const recreatedFirstPrompt = await azureOpenAICompletion(userTone, true, firstPrompt);
+	console.log("Recreated What can I help you into:  " + recreatedFirstPrompt)
+	//await convertTextToSpeech(recreatedFirstPrompt || firstPrompt);
 
-		const qnaResponse = qnaAPIResponse.answers[0].answer;
 
-		const contextBasedReponse = await generateQNASystemReply(
-			qnaResponse,
-			"sad"
-		);
-		convertTextToSpeech(contextBasedReponse);
-		return qnaResponse.answers[0].answer;
-	}
+	// Get user input (e.g., from voice transcription)
+	//userQuestion = await transcribeAudioFromMicrophone();
+	userQuestion = "How can I change the delivery date for my shipment";
+	console.log("Customer Question: " + userQuestion);
+
+
+	const firstAnswer = await azureOpenAICompletion(userTone, !reformatMessage, userQuestion || 'Can I change the delivery for my shipment package.');
+	console.log(firstAnswer);
+
+	return firstAnswer;
+
+
 }
 
-async function makeQNARequest(userQuestion: string) {
-	const url = import.meta.env.VITE_AZURE_QNA_URL || "";
-	const subscriptionKey = import.meta.env.VITE_AZURE_QNA_API_KEY || "";
+/*
+async function makeQNARequest(userQuestion : string) {
+	const url = process.env.EXPO_PUBLIC_AZURE_QNA_URL || ''
+	const subscriptionKey = process.env.EXPO_PUBLIC_AZURE_QNA_API_KEY || '';
 
 	const requestBody = {
 		top: 3,
 		question: userQuestion,
 		includeUnstructuredSources: true,
-		confidenceScoreThreshold: "0.6",
+		confidenceScoreThreshold: '0.6',
 		answerSpanRequest: {
 			enable: true,
 			topAnswersWithSpan: 1,
-			confidenceScoreThreshold: "0.7",
+			confidenceScoreThreshold: '0.7',
 		},
 		filters: {
 			metadataFilter: {
-				logicalOperation: "AND",
+				logicalOperation: 'AND',
+
 			},
 		},
 	};
 
 	try {
 		const response = await fetch(url, {
-			method: "POST",
+			method: 'POST',
 			headers: {
-				"Content-Type": "application/json",
-				"Ocp-Apim-Subscription-Key": subscriptionKey,
+				'Content-Type': 'application/json',
+				'Ocp-Apim-Subscription-Key': subscriptionKey,
 			},
 			body: JSON.stringify(requestBody),
 		});
 
 		if (response.ok) {
 			const data = await response.json();
-			console.log("Response:", data);
+			console.log('Response:', data);
 			return data;
 		} else {
-			console.error("Error:", response.statusText);
+			console.error('Error:', response.statusText);
 		}
 	} catch (error) {
-		console.error("An error occurred:", error);
+		console.error('An error occurred:', error);
 	}
 }
-
-export default getAnswersFromUserInput;
+*/
+export default getAnswersFromQNA;

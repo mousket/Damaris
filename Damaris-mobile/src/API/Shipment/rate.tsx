@@ -47,7 +47,6 @@ interface RateRequest {
 }
 
 //Take a RateRequest object and issues a list of rates
-
 async function getShipmentRate(rateRequest: RateRequest): Promise<any> {
     try {
         const bearerToken = await fetchPitneyBowesBearerToken(); // Assuming fetchPitneyBowesBearerToken returns a promise

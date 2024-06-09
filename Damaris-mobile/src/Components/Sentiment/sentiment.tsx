@@ -1,6 +1,7 @@
 import axios from "axios";
 import { OpenAIClient, AzureKeyCredential } from "@azure/openai";
-
+import { AzureOpenAI } from "openai";
+import { DefaultAzureCredential, getBearerTokenProvider } from "@azure/identity";
 interface UserReply {
     Reply: string;
     Sentiment: number;
@@ -29,9 +30,7 @@ const sentimentToTone: Record<number, string> = {
 };
 
 //List of user replies
-const userReplies = {
-
-}
+const userReplies: UserReply[] = [];
 
 interface UserReply {
     Reply: string;
@@ -64,8 +63,8 @@ function getConsiderateTone(userReplies: UserReply[]): string {
 
 async function analyzeReplySentimentWithCognitiveServices(text: string): Promise<number | null> {
     try {
-        const apiKey = process.env.TEXT_ANALYTICS_API_KEY;
-        const endpoint = process.env.TEXT_ANALYTICS_ENDPOINT;
+        const apiKey = process.env.EXPO_PUBLIC_TEXT_ANALYTICS_API_KEY;
+        const endpoint = process.env.EXPO_PUBLIC_TEXT_ANALYTICS_ENDPOINT;
 
         if (!apiKey || !endpoint) {
             console.error("API key or endpoint not provided in environment variables.");
@@ -80,6 +79,16 @@ async function analyzeReplySentimentWithCognitiveServices(text: string): Promise
         });
 
         const sentimentScore = response.data.documents[0].confidenceScores.positive;
+
+        const newUserReply: UserReply = {
+            Reply: text,
+            Sentiment: sentimentScore,
+        };
+
+        // Add the new UserReply to the list
+        userReplies.push(newUserReply);
+
+
         return sentimentScore;
     } catch (error) {
         console.error("Error analyzing sentiment:", error);
@@ -94,20 +103,26 @@ function generateConsiderateSystemPrompt(userTone: string, baseRequest: string):
     const prompt = `
         You are a customer service rep from a shipping company.
         
-        Considering that the overall tone of the customer is  $usertone,
-        generate an appropriate and sensitive message that is meant to $baserequest.
+        Considering that the overall tone of the customer is  ` + userTone +
+        `, generate an appropriate and sensitive message that is meant to ` + baseRequest;
         
-        Usertone: Happy
+        `Usertone: Happy
         Baserequest: Ask for your shipping address?
         Response: Thank you so much. I’m glad to have been of service. Now, can you let me know to what address you're thinking about shipping your item?
         
-        Usertone: Frustrated
-        Baserequest: Ask for your shipping address?
-        Response: I am sorry you feel frustrated. I feel for you. Let me know quickly where you'd like to ship your item, and I promise we will be done soon.
-        
         Usertone: Curious
         Baserequest: Ask for your shipping address?
-        Response:
+        Response: Certainly! It’s great to assist you. If you have any specific questions or need help with anything, feel free to ask. 
+        
+        Usertone: Frustrated
+        Baserequest: Ask for your shipping address?
+        Response: I apologize for any confusion, but it seems there might be a mix-up. 
+        The requests you’ve mentioned appear to be related to shipping addresses, but I don’t have any context or specific item to ship.
+        Could you please provide more details or clarify your request? I’d be happy to assist! 
+        
+        Usertone:` + userTone + `
+        Baserequest: ` + baseRequest + `
+        Response: 
         `;
 
     return prompt;
@@ -119,22 +134,33 @@ async function createUserSentimentConsiderateSystemPrompt(userReplies: UserReply
     try {
         // Initialize the OpenAI client
         // Initialize the OpenAI client
-        const openAIEndPoint = process.env.AZ_OPENAI_ENDPOINT ;
-        const openAIKEY = process.env.AZ_OPENAI_KEY;
-        const openAIModel = process.env.AZ_OPENAI_MODEL;
+        const openAIEndPoint = process.env.EXPO_PUBLIC_AZ_OPENAI_ENDPOINT ;
+        const openAIKEY = process.env.EXPO_PUBLIC_AZ_OPENAI_KEY;
+        const openAIModel = process.env.EXPO_PUBLIC_AZ_OPENAI_MODEL;
         const openAIDeployment = process.env.EXPO_PUBLIC_AZ_OPENAI_MODEL || '';
+
+
+        const scope = "https://cognitiveservices.azure.com/.default";
+        const azureADTokenProvider = getBearerTokenProvider(new DefaultAzureCredential(), scope);
 
         const azureOpenAIKEY =  new AzureKeyCredential(openAIKEY || "");
         const client = new OpenAIClient(openAIEndPoint || "", azureOpenAIKEY);
+        const deployment = process.env.EXPO_PUBLIC_AZ_OPENAI_MODEL || '';
+        const apiVersion = "0301";
+
+        const azureClient = new AzureOpenAI({ azureADTokenProvider, deployment, apiVersion });
+
 
         // Find the user's overall tone from the sentiment analysis of the list of replies
         const userTone = getConsiderateTone(userReplies);
 
         // Craft the considerate prompt
         const consideratePrompt = generateConsiderateSystemPrompt(userTone, baseRequest);
+        const prompt = [consideratePrompt];
 
         // Generate the final response using Azure OpenAI
         const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt]);
+        //const { id, created, choices, usage } = await azureClient.completions({ prompt, model: openAIDeployment, max_tokens: 128});
         const response = choices[0].text.trim();
 
         return response;
@@ -147,42 +173,43 @@ async function createUserSentimentConsiderateSystemPrompt(userReplies: UserReply
 async function generateQNASystemReply(baseRequest: string, userTone: string): Promise<string> {
     try {
         // Initialize the OpenAI client
-        const openAIEndPoint = process.env.EXPO_PUBLIC_AZ_OPENAI_ENDPOINT ;
-        const openAIKEY = process.env.EXPO_PUBLIC_AZ_OPENAI_KEY;
+        const openAIEndPoint = process.env.EXPO_PUBLIC_AZ_OPENAI_ENDPOINT || '';
+        const openAIKEY = process.env.EXPO_PUBLIC_AZ_OPENAI_KEY || '';
         const openAIDeployment = process.env.EXPO_PUBLIC_AZ_OPENAI_MODEL || '';
 
-        const azureOpenAIKEY =  new AzureKeyCredential(openAIKEY || "");
-        const client = new OpenAIClient(openAIEndPoint || "", azureOpenAIKEY);
+        const azureOpenAIKEY =  new AzureKeyCredential(openAIKEY );
+        const client = new OpenAIClient(openAIEndPoint, azureOpenAIKEY);
 
 
         // Craft the considerate prompt
         const consideratePrompt = reformatQNASystemPrompt(userTone, baseRequest);
 
+        console.log("New prompt to customer: " + consideratePrompt);
+
         // Generate the final response using Azure OpenAI
         const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt]);
-        //const { id, created, choices, usage } = await client.getCompletions("<deployment ID>", [consideratePrompt]);
+        //const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt]);
         const response = choices[0].text.trim();
 
         return response;
     } catch (error) {
         console.error("Error generating considerate prompt:", error);
-        return "Oops, something went wrong!";
+        return " ";
     }
 }
 
 
-function reformatQNASystemPrompt(userTone: string, baseRequest: string): string {
+function reformatQNASystemPrompt(userTone: string, systemPrompt: string): string {
     // Customize the considerate prompt based on user tone and base request
     // You can add more logic here as needed
     const prompt = `
-        You are a customer service rep from a shipping company.
-        
-        Considering that the overall tone of the customer is  $usertone,
-        generate an appropriate, succinct and customer tone sensitive message that is meant to summarize the message below .
+        You are a customer service rep at a shipping company.        
+        Considering that your customer is feeling` +  userTone + `, ` +
+        `generate an appropriate, succinct and customer tone sensitive message that summarizes the message below .
         
         --------
-        $baserequest
-        ------------       
+        ` + systemPrompt +
+        `------------       
         
         `;
 
@@ -190,18 +217,4 @@ function reformatQNASystemPrompt(userTone: string, baseRequest: string): string 
 }
 
 export default generateQNASystemReply;
-/*
-// Example usage:
 
-const userReplies: UserReply[] = [
-  { Reply: "I love this product!", Sentiment: 0.8 },
-  { Reply: "The service has been disappointing.", Sentiment: 0.2 },
-  // Add more user replies here...
-];
-
-const baseRequest = "Please assist with my order.";
-
-createUserSentimentConsiderateSystemPrompt(userReplies, baseRequest)
-  .then((result) => console.log("Considerate prompt:", result))
-  .catch((error) => console.error("Error:", error));
-*/

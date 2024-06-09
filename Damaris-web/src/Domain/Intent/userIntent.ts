@@ -54,6 +54,11 @@ async function analyzeUserInputForDamarisIntent(
 				console.log("Handling shipping intent...");
 				navigate("/audioshipping");
 				break;
+			case "QnaIntent":
+				// Implement logic for shipping-related stages (address input, item details, etc.)
+				console.log("Handling shipping intent...");
+				navigate("/audioqna");
+				break;
 			case "TrackingIntent":
 				// Implement logic for tracking a shipment based on the provided tracking number.
 				console.log("Handling tracking intent...");
