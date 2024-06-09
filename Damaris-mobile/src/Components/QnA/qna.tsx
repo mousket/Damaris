@@ -1,37 +1,66 @@
 import transcribeAudioFromMicrophone from "../Speech/audioToText";
 import convertTextToSpeech from "../Speech/textToAudio";
 import generateQNASystemReply from "../Sentiment/sentiment";
-
+import {azureOpenAIChat, azureOpenAICompletion} from "../AzureOpenAI/openAI";
 
 
 // Function to get answers based on user input
-async function getAnswersFromUserInput() {
-    let question = '';
-    while (!question.toLowerCase().includes('something else')) {
+async function getAnswersFromQNA() {
+    let userQuestion = '';
+    //while (!userQuestion.toLowerCase().includes('something else') ||
+    //  !userQuestion.toLowerCase().includes('no')) {
         // Get user input (e.g., from voice transcription)
-        console.log('What is your question?');
+        const firstPrompt = "What can I help you with";
+        //const recreatedFirstPrompt = await generateQNASystemReply(firstPrompt,'sad');
+
+        const recreatedFirstPrompt = await azureOpenAICompletion(firstPrompt);
+        convertTextToSpeech(recreatedFirstPrompt);
+
 
         // Assume you have a way to get user input (e.g., from microphone)
         // For this example, we'll use a hardcoded question:
-        //question = await transcribeAudioFromMicrophone();
-        question = 'when will my package arrive?';
 
+        userQuestion = await transcribeAudioFromMicrophone();
+        console.log("Customer Question: " + userQuestion);
+
+        const firstAnswer = await azureOpenAICompletion(userQuestion);
+        console.log(firstAnswer);
+
+        const secondAnswer = await azureOpenAIChat(userQuestion);
+        console.log(secondAnswer);
+
+        return secondAnswer;
+
+        /*
         // Submit the question to the project
-        const qnaAPIResponse = await makeQNARequest(question);
+        const qnaAPIResponse = await makeQNARequest(userQuestion);
 
+        /*
         // Display the answers
         for (const answer of qnaAPIResponse.answers) {
             console.log(`Answer: ${answer.answer}`);
             console.log(`Confidence: ${answer.confidence}`);
             console.log(`Source: ${answer.source}`);
         }
+        */
 
+        /*
         const qnaResponse = qnaAPIResponse.answers[0].answer;
+        console.log("QNA Response: " + qnaResponse);
 
         const contextBasedReponse = await generateQNASystemReply(qnaResponse,'sad')
         convertTextToSpeech(contextBasedReponse);
+        console.log("OpenAI Response:" + contextBasedReponse);
+
+        const finalSystemPrompt =  "What else can I help you with or would you like to do something";
+        const systemPrompt = await generateQNASystemReply(finalSystemPrompt,'sad');
+        convertTextToSpeech(systemPrompt);
+
+
         return qnaResponse.answers[0].answer;
-    }
+
+        */
+    //}
 }
 
 
@@ -79,4 +108,4 @@ async function makeQNARequest(userQuestion : string) {
     }
 }
 
-export default getAnswersFromUserInput;
+export default getAnswersFromQNA;
