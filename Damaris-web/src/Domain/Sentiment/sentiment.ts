@@ -34,11 +34,10 @@ export function getGeneralUserSentiment(): string {
 }
 
 export function computeOverallSentiment(): number | null {
-
 	const userRepliesContent = useContext(UserRepliesContext);
 
 	if (userRepliesContent?.userReplies.length === 0) {
-		return null; // No data to analyze
+		return 6;
 	}
 
 	const userReplyList = userRepliesContent?.userReplies;
