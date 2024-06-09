@@ -70,13 +70,6 @@ export async function askOpenAI(prompt: string): Promise<void> {
 	const consideratePrompt = await reformatSystemPrompt("frustrated", prompt);
 	//console.log("New prompt to customer: " + consideratePrompt);
 
-	// Generate the final response using Azure OpenAI
-	//const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt], completionsOptions);
-	//const response = choices[0].text.trim();
-	//await speechSynthesizer.speakTextAsync(response);
-    // Craft the considerate prompt
-    const consideratePrompt = await reformatSystemPrompt( "frustrated", prompt);
-
 	const responseStream = await client.streamCompletions(
 		openAIDeployment,
 		[consideratePrompt],
