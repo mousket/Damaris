@@ -21,11 +21,10 @@ import transcribeAudioFromMicrophone from "../Components/Speech/audioToText";
 import convertTextToSpeech from "../Components/Speech/textToAudio";
 import analyzeUserInputForDamarisIntent from "../Components/Intent/userIntent";
 import audioToTextFromFile from "../Components/Speech/audioToTextFromFile";
-import Animated from "react-native-reanimated";
-import getAnswersFromQNA from "../Components/QnA/qna";
 import {getSentimentScore} from "../Components/Sentiment/textSentimentAnalysis";
-import {askOpenAI, chatWithOpenAI} from "../Components/AzureOpenAI/openAI";
+import {askOpenAI} from "../Components/AzureOpenAI/openAI";
 import customEntityExtraction from "../Components/CustomEntityExtraction/customeEntityExtraction";
+import {getGeneralUserSentiment} from "../Components/Sentiment/sentiment";
 
 
 const AudioRecord = () => {
@@ -82,13 +81,17 @@ const AudioRecord = () => {
 			//This is what we will use to capture user's audio stream and transcribe it into text for analysis
 			// const firstContact = await transcribeAudioFromMicrophone();
 
-			 //Analyzing text for intent: Shipping Itent, Tracking Intent, Shipping Info Intent etc
+			 //Analyzing text for intent: Shipping Intent, Tracking Intent, Shipping Info Intent etc.
 			//await analyzeUserInputForDamarisIntent(firstContact);
 
-			const sentiment = await getSentimentScore("I'm feeling pretty sad today. But I have ot keep on fighting. I don't have a choice. I must win this competition");
+			let sentiment = await getSentimentScore("I'm feeling pretty sad today. But I have ot keep on fighting. I don't have a choice. I must win this competition");
 			console.log(sentiment);
 
 			const query = await transcribeAudioFromMicrophone();
+			let sentimentScore = await getSentimentScore(query);
+			let userTone = await getGeneralUserSentiment();
+			console.log("Sentiment Analysis user message:  " + sentiment + ": " + sentimentScore);
+
 			const entity = await customEntityExtraction(query);
 
 			const openAIAnswer = await askOpenAI(query);

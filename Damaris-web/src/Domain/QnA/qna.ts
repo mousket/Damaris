@@ -1,86 +1,32 @@
-/*
 import transcribeAudioFromMicrophone from "../Speech/audioToText";
 import convertTextToSpeech from "../Speech/textToAudio";
-*/
-import { azureOpenAICompletion } from "../AzureOpenAI/openAI";
+import { openAICall} from "../AzureOpenAI/openAI";
+
+
 
 // Function to get answers based on user input
-async function getAnswersFromQNA() {
-	let userQuestion = "";
-	//while (!userQuestion.toLowerCase().includes('something else') ||
-	//  !userQuestion.toLowerCase().includes('no')) {
+export async function getAnswersFromQNA() {
+	const openingMessage = "Hi! How can I help you?";
+	const recreatedFirstPrompt = await openAICall(openingMessage, false);
+	console.log("Recreated What can I help you into:  " + recreatedFirstPrompt)
 
-	const firstPrompt = "HI! How can I help you?";
-
-	const userTone = "in need of motivation";
-
-	const reformatMessage = true;
-	const recreatedFirstPrompt = await azureOpenAICompletion(
-		userTone,
-		true,
-		firstPrompt
-	);
-	console.log("Recreated What can I help you into:  " + recreatedFirstPrompt);
-	//await convertTextToSpeech(recreatedFirstPrompt || firstPrompt);
+	//System speaks the recreated opening message
+	await convertTextToSpeech(recreatedFirstPrompt);
 
 	// Get user input (e.g., from voice transcription)
-	//userQuestion = await transcribeAudioFromMicrophone();
-	userQuestion = "How can I change the delivery date for my shipment";
-	console.log("Customer Question: " + userQuestion);
+	let userQuestion = await transcribeAudioFromMicrophone();
+	while (
+		!userQuestion.toLowerCase().includes('error') ||
+		!userQuestion.toLowerCase().includes('no speech detected') ||
+		!userQuestion.toLowerCase().includes('something else') ||
+		!userQuestion.toLowerCase().includes('no')) {
 
-	const firstAnswer = await azureOpenAICompletion(
-		userTone,
-		!reformatMessage,
-		userQuestion || "Can I change the delivery for my shipment package."
-	);
-	console.log(firstAnswer);
+		console.log("Customer Reply: " + userQuestion);
+		const firstAnswer = await openAICall(userQuestion, true);
+		console.log("Damaris Reply: " + firstAnswer);
 
-	return firstAnswer;
-}
-
-/*
-async function makeQNARequest(userQuestion : string) {
-	const url = import.meta.env.VITE_AZURE_QNA_URL || ''
-	const subscriptionKey = import.meta.env.VITE_AZURE_QNA_API_KEY || '';
-
-	const requestBody = {
-		top: 3,
-		question: userQuestion,
-		includeUnstructuredSources: true,
-		confidenceScoreThreshold: '0.6',
-		answerSpanRequest: {
-			enable: true,
-			topAnswersWithSpan: 1,
-			confidenceScoreThreshold: '0.7',
-		},
-		filters: {
-			metadataFilter: {
-				logicalOperation: 'AND',
-
-			},
-		},
-	};
-
-	try {
-		const response = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Ocp-Apim-Subscription-Key': subscriptionKey,
-			},
-			body: JSON.stringify(requestBody),
-		});
-
-		if (response.ok) {
-			const data = await response.json();
-			console.log('Response:', data);
-			return data;
-		} else {
-			console.error('Error:', response.statusText);
-		}
-	} catch (error) {
-		console.error('An error occurred:', error);
+		// User responds to message or ask another question
+		userQuestion = await transcribeAudioFromMicrophone();
 	}
 }
-*/
-export default getAnswersFromQNA;
+

@@ -1,4 +1,4 @@
-import getAnswersFromUserInput from "@/Domain/QnA/qna";
+import {getAnswersFromQNA} from "@/Domain/QnA/qna";
 import AudioRecord from "@/components/shipping/AudioRecord";
 import {
 	Card,
@@ -20,7 +20,7 @@ const AudioShipping = () => {
 				</CardHeader>
 				<CardContent className="grid gap-4">
 					<div>
-						<AudioRecord handleText={getAnswersFromUserInput} />;
+						<AudioRecord handleText={getAnswersFromQNA} />;
 					</div>
 				</CardContent>
 			</Card>

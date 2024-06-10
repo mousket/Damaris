@@ -1,6 +1,4 @@
-import { RateRequest } from "@/Classes/Shipment/rateRequest";
-
-const rateRequest = {
+const rateRequestExample = {
 	dateOfShipment: "2023-07-12",
 	fromAddress: {
 		addressLine1: "27 Watervw Dr",
@@ -43,7 +41,7 @@ const rateRequest = {
 	isHazmat: false,
 };
 
-const rateRequest1: RateRequest = {
+const rateRequestSecondExample: RateRequest = {
 	dateOfShipment: "2023-07-12",
 	fromAddress: {
 		addressLine1: "27 Watervw Dr",
@@ -60,9 +58,9 @@ const rateRequest1: RateRequest = {
 		residential: false,
 	},
 	parcel: {
-		height: 4.0, //"IMPORTANT",
-		length: 5.6, //"IMPORTANT",
-		width: 10, //"IMPORTANT",
+		height: 0,
+		length: 0,
+		width: 0,
 		dimUnit: "IMPORTANT",
 		weightUnit: "IMPORTANT",
 		weight: 100000,
@@ -86,3 +84,4 @@ const rateRequest1: RateRequest = {
 		stateProvince: "IMPORTANT",
 	},
 };
+console.log(rateRequestSecondExample.carrierAccounts);

@@ -24,7 +24,7 @@ const sentimentToTone: Record<number, string> = {
 };
 
 
-function getGeneralUserSentiment(): string {
+export function getGeneralUserSentiment(): string {
 	const overallSentiment = computeOverallSentiment();
 	if (overallSentiment === null) {
 		return "Neutral"; // Default to Neutral if no data
@@ -33,12 +33,11 @@ function getGeneralUserSentiment(): string {
 	return userTone;
 }
 
-function computeOverallSentiment(): number | null {
-
+export function computeOverallSentiment(): number | null {
 	const userRepliesContent = useContext(UserRepliesContext);
 
 	if (userRepliesContent?.userReplies.length === 0) {
-		return null; // No data to analyze
+		return 6;
 	}
 
 	const userReplyList = userRepliesContent?.userReplies;
@@ -55,32 +54,70 @@ function computeOverallSentiment(): number | null {
 }
 
 
-export function generateConsiderateSystemPrompt(
-	userTone: string,
-	baseRequest: string
-): string {
+
+
+//Use to improve System Replies and questions to the user.
+export function reformatSystemMessage(request: string): string {
+	const userTone = getGeneralUserSentiment();
+
+	const prompt = `        
+        recreate the message below to engage a customer who is` +  userTone + `.` +  `
+        --------
+        ` + request + `
+        ------------  `;
+	return prompt;
+}
+
+
+export function reformatQnaMessage(baseRequest: string): string {
 	// Customize the considerate prompt based on user tone and base request
-	// You can add more logic here as needed
+	const mood = computeOverallSentiment();
 	const prompt = `
-        You are a customer service rep from a shipping company.
-        reimagine the message below to properly engage customer feeling ` +  userTone + `,
-        --------`
-      	+  baseRequest + `
+        Generate an appropriate and sensitive message to a user's mood following the format below:
         
-        Usertone: Happy
+        Mood: 0.8
         Baserequest: Ask for your shipping address?
         Response: Thank you so much. I’m glad to have been of service. Now, can you let me know to what address you're thinking about shipping your item?
         
-        Usertone: Frustrated
+        Mood: 0.6
         Baserequest: Ask for your shipping address?
-        Response: I am sorry you feel frustrated. I feel for you. Let me know quickly where you'd like to ship your item, and I promise we will be done soon.
+        Response: Certainly! It’s great to assist you. If you have any specific questions or need help with anything, feel free to ask. 
         
-        Usertone: Curious
+        Mood: 0.2
         Baserequest: Ask for your shipping address?
-        Response:
+        Response: I apologize for any confusion, but it seems there might be a mix-up. 
+        The requests you’ve mentioned appear to be related to shipping addresses, but I don’t have any context or specific item to ship.
+        Could you please provide more details or clarify your request? I’d be happy to assist! 
+        
+        Mood: ` + mood + `
+        Baserequest: ` + baseRequest + `
+        Response: 
         `;
 
 	return prompt;
 }
 
-export default getGeneralUserSentiment;
+/*
+//To answer question from the user
+export function reformatQnaMessage(request: string): string {
+	// Customize the considerate prompt based on user tone and base request
+	// You can add more logic here as needed
+	const userTone = getGeneralUserSentiment();
+
+	const prompt =
+		`
+        Answer the question below as shortly as you can and modify your language to accommodate a customer be mindful of a who is feeling` +
+		userTone +
+		`.` +
+		`
+        --------
+        ` +
+		request +
+		`
+        ------------
+        `;
+
+	return prompt;
+}
+*/
+
