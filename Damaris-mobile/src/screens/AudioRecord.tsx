@@ -25,6 +25,7 @@ import {getSentimentScore} from "../Components/Sentiment/textSentimentAnalysis";
 import {askOpenAI} from "../Components/AzureOpenAI/openAI";
 import customEntityExtraction from "../Components/CustomEntityExtraction/customeEntityExtraction";
 import {getGeneralUserSentiment} from "../Components/Sentiment/sentiment";
+import {getAnswersFromQNA} from "../Components/QnA/qna";
 
 
 const AudioRecord = () => {
@@ -123,13 +124,18 @@ const AudioRecord = () => {
 					"CSR: You’re welcome, Sally! Have a great day, and safe shipping!\n" +
 					"\n" ;
 
-				//const query = await transcribeAudioFromMicrophone();
-				console.log("User Message: " + query);
-			 	let sentimentScore = await getSentimentScore(query);
-				let userTone = await getGeneralUserSentiment();
-				console.log("Sentiment Analysis user message:  " + userTone + ": " + sentimentScore);
+				//query = await transcribeAudioFromMicrophone();
+				//console.log("User Message: " + query);
+			 	//let sentimentScore = await getSentimentScore(query);
+				//let userTone = await getGeneralUserSentiment();
+				//console.log("Sentiment Analysis user message:  " + userTone + ": " + sentimentScore);
 
-			     const entity = await customEntityExtraction(query);
+			     //const entity = await customEntityExtraction(query);
+
+				await getAnswersFromQNA();
+
+				//console.log(entity);
+
 			/*
                        const openAIAnswer = await askOpenAI(query);
            */

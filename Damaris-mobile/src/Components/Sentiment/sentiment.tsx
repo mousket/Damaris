@@ -75,7 +75,7 @@ export function reformatSystemMessage(request: string): string {
 }
 
 
-export function generateConsiderateSystemPrompt(baseRequest: string): string {
+export function reformatQnaMessage(baseRequest: string): string {
     // Customize the considerate prompt based on user tone and base request
     const mood = computeOverallSentiment();
     const prompt = `

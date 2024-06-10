@@ -15,15 +15,17 @@ import {
 } from "microsoft-cognitiveservices-speech-sdk";
 
 
-import {getGeneralUserSentiment, reformatSystemMessage} from "../Sentiment/sentiment"
+import {getGeneralUserSentiment, reformatQnaMessage, reformatSystemMessage} from "../Sentiment/sentiment"
+import {request} from "axios";
+import convertTextToSpeech from "../Speech/textToAudio";
 
 // Initialize the OpenAI client
-const openAIEndPoint = import.meta.env.VITE_AZ_OPENAI_ENDPOINT || "";
-const openAIKEY = import.meta.env.VITE_AZ_OPENAI_KEY || "";
-const openAIDeployment = import.meta.env.VITE_AZ_OPENAI_MODEL || "";
+const openAIEndPoint = process.env.EXPO_PUBLIC_AZ_OPENAI_ENDPOINT || "";
+const openAIKEY = process.env.EXPO_PUBLIC_AZ_OPENAI_KEY || "";
+const openAIDeployment = process.env.EXPO_PUBLIC_AZ_OPENAI_MODEL || "";
 
-const speechKey = import.meta.env.VITE_SPEECH_SUBSCRIPTION_KEY || "";
-const speechRegion = import.meta.env.VITE_SPEECH_SERVICE_REGION || "";
+const speechKey = process.env.EXPO_PUBLIC_SPEECH_SUBSCRIPTION_KEY || "";
+const speechRegion = process.env.EXPO_PUBLIC_SPEECH_SERVICE_REGION || "";
 
 const sentenceSeparators: string[] = [
     ".",
@@ -176,6 +178,8 @@ export async function openAICall(request: string, isQna: boolean): Promise<strin
         completionsOptions
     );
 
+    let result = "";
+/*
     // Capture the first response
     let result = "";
     for await (const response of responseStream) {
@@ -183,5 +187,28 @@ export async function openAICall(request: string, isQna: boolean): Promise<strin
         break; // Exit the loop after the first response
     }
 
+    return result;
+ */
+
+    const gptBuffer: string[] = [];
+    for await (const completionUpdate of responseStream) {
+        const message = completionUpdate.choices[0]?.text;
+        if (!message) {
+            continue;
+        }
+
+        gptBuffer.push(message);
+
+        if (sentenceSeparators.some((separator) => message.includes(separator))) {
+            const sentence = gptBuffer.join("").trim();
+            if (sentence) {
+                result = sentence;
+                //System Text To Speech
+                await convertTextToSpeech(sentence);
+                gptBuffer.length = 0; // Clear the buffer
+            }
+        }
+        break;
+    }
     return result;
 }

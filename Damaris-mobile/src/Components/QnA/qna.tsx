@@ -6,11 +6,12 @@ import { openAICall} from "../AzureOpenAI/openAI";
 // Function to get answers based on user input
 export async function getAnswersFromQNA() {
     const openingMessage = "Hi! How can I help you?";
-    const recreatedFirstPrompt = await openAICall(openingMessage, false);
-    console.log("Recreated What can I help you into:  " + recreatedFirstPrompt)
+   // const recreatedFirstPrompt = await openAICall(openingMessage, false);
+    //console.log("Recreated What can I help you into:  " + recreatedFirstPrompt)
 
     //System speaks the recreated opening message
-    await convertTextToSpeech(recreatedFirstPrompt);
+    await convertTextToSpeech(openingMessage);
+    //await convertTextToSpeech(recreatedFirstPrompt);
 
     // Get user input (e.g., from voice transcription)
     let userQuestion = await transcribeAudioFromMicrophone();
