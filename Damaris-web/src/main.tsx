@@ -13,7 +13,7 @@ import ShippingForm from "./pages/ShippingForm";
 import IntentForm from "./pages/IntentForm";
 import AudioIntent from "./pages/AudioIntent";
 import AudioShipping from "./pages/AudioShipping";
-import CarrerChoice from "./pages/CarrerChoice";
+import CarrierChoice from "./pages/CarrierChoice";
 import { createContext } from 'react';
 import getSentimentScore from "@/Domain/Sentiment/textSentimentAnalysis";
 
@@ -60,7 +60,7 @@ const router = createBrowserRouter(
 			<Route path="/shipform" element={<ShippingForm />} />
 			<Route path="/audio" element={<AudioIntent />} />
 			<Route path="/audioshipping" element={<AudioShipping />} />
-			<Route path="/carrerchoice" element={<CarrerChoice />} />
+			<Route path="/carrierchoice" element={<CarrierChoice />} />
 		</Route>
 	)
 );

@@ -69,7 +69,7 @@ export async function askOpenAI(prompt: string): Promise<void> {
 	};
 
 	// Craft the considerate prompt
-	const consideratePrompt = await reformatSystemPrompt(prompt);
+	const consideratePrompt = reformatSystemPrompt(prompt);
 
 	const responseStream = await client.streamCompletions(
 		openAIDeployment,
@@ -144,7 +144,7 @@ export async function chatWithOpenAI(): Promise<void> {
 }
 
 
-//Parameters: request to send to open ai
+//Parameters: request to send to open AI
 //parameters  isQna boolean
 export async function openAICall(request: string, isQna: boolean): Promise<string> {
 	// Initialize your speech configuration (if needed)
@@ -162,7 +162,7 @@ export async function openAICall(request: string, isQna: boolean): Promise<strin
 			{ role: "system", content: systemMessage },
 			{ role: "user", content: request }
 		],
-		maxTokens: 120,
+		maxTokens: 150,
 		temperature: 0.9,
 	};
 	const consideratePrompt = (isQna) ? reformatQnaMessage(prompt) : reformatSystemMessage(prompt);
