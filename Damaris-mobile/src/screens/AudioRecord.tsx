@@ -22,7 +22,7 @@ import convertTextToSpeech from "../Components/Speech/textToAudio";
 import analyzeUserInputForDamarisIntent from "../Components/Intent/userIntent";
 import audioToTextFromFile from "../Components/Speech/audioToTextFromFile";
 import {getSentimentScore} from "../Components/Sentiment/textSentimentAnalysis";
-import {askOpenAI} from "../Components/AzureOpenAI/openAI";
+import {askOpenAI, openAICall} from "../Components/AzureOpenAI/openAI";
 import customEntityExtraction from "../Components/CustomEntityExtraction/customeEntityExtraction";
 import {getGeneralUserSentiment} from "../Components/Sentiment/sentiment";
 import {getAnswersFromQNA} from "../Components/QnA/qna";
@@ -124,25 +124,20 @@ const AudioRecord = () => {
 					"CSR: You’re welcome, Sally! Have a great day, and safe shipping!\n" +
 					"\n" ;
 
-				//query = await transcribeAudioFromMicrophone();
-				//console.log("User Message: " + query);
+				query = await transcribeAudioFromMicrophone();
+				console.log("User Message: " + query);
 			 	//let sentimentScore = await getSentimentScore(query);
 				//let userTone = await getGeneralUserSentiment();
 				//console.log("Sentiment Analysis user message:  " + userTone + ": " + sentimentScore);
 
 			     //const entity = await customEntityExtraction(query);
 
-				await getAnswersFromQNA();
+				//const systemReply = await askOpenAI(query);
+				//convertTextToSpeech(systemReply);
 
-				//console.log(entity);
+				const systemReply2 = await openAICall(query, true);
+				convertTextToSpeech(systemReply2);
 
-			/*
-                       const openAIAnswer = await askOpenAI(query);
-           */
-			//console.log(openAIAnswer);
-
-			//await chatWithOpenAI();
-			//const answer = getAnswersFromQNA();
 
 			//This is what we will use to Give a voice to the system when it talks to the user
 			 //convertTextToSpeech(transcription);
