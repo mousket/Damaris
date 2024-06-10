@@ -2,6 +2,7 @@ import transcribeAudioFromMicrophone from "@/Domain/Speech/audioToText";
 import { UserRepliesContext } from "@/main";
 import { useState, useContext, useEffect } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
+import { openAICall } from "@/Domain/AzureOpenAI/openAI";
 
 enum AiState {
 	IS_RECORDING, IS_SPEAKING, IS_LOADING, NONE
@@ -23,14 +24,22 @@ const AudioRecord = ({
 
 	// TODO: handle prompts
 	useEffect(() => {
+			promptToSpeech();
+	}, [handlePrompt])
+
+	const promptToSpeech = async () => {
 		if(handlePrompt) {
 			setAiState(AiState.IS_LOADING)
 			// Rephrase prompt and play for user
+			let result = await openAICall(handlePrompt.prompt, false)
 			// text to speech
 			// setSpeech
+			setAiState(AiState.IS_SPEAKING)
+			// After speaking
+			setAiState(AiState.IS_RECORDING)
 		}
-	}, [handlePrompt])
-
+	};
+	
 	const record = async () => {
 		setIsRecording(true);
 		const recognizedText = await transcribeAudioFromMicrophone();
@@ -39,6 +48,8 @@ const AudioRecord = ({
 			userRepliesContent?.handleAddUserReply(recognizedText)
 		}
 		setIsRecording(false);
+		console.log("there");
+		if(handlePrompt) await handlePrompt.handleResponse(recognizedText);
 		if(handleText) await handleText(text, navigate);
 	};
 

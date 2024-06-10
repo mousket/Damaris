@@ -1,6 +1,7 @@
 import RateRequest from "@/Interfaces/Shipment/RateRequest";
 import Scheme from "@/Schemes/Scheme";
 import Input from "@/Base/Input";
+import Model from "@/Base/Model";
 
 // Scheme to configure the rate model
 export default class RateScheme extends Scheme<RateRequest> {

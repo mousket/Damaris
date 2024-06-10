@@ -1,3 +1,5 @@
+import Model from "@/Base/Model";
+
 export default class Scheme<T> {
     models: Model[] = [];
     

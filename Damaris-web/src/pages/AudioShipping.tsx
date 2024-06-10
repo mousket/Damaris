@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import RateScheme from "@/Schemes/RateScheme";
+import customEntityExtraction from "@/Domain/CustomEntityExtraction/customeEntityExtraction";
 
 const AudioShipping = () => {
 	const [handlePrompt, setHandlePrompt] = useState<{ prompt: string, handleResponse: (text: string) => Promise<boolean>} | null | undefined>(null);
@@ -69,6 +70,9 @@ const AudioShipping = () => {
 			prompt: text,
 			handleResponse: async (text: string) => {
 				// extract entities
+				console.log(text);
+				const result = await customEntityExtraction(text);
+				console.log(text, result);
 				return new Promise<boolean>((resolve, reject) => {
 					
 				});

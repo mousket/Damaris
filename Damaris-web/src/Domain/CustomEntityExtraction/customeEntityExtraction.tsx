@@ -2,15 +2,15 @@
 
 import {AnalyzeBatchAction} from "@azure/ai-language-text";
 
-const { TextAnalyticsClient, AzureKeyCredential } = require("@azure/ai-text-analytics");
+import { TextAnalyticsClient, AzureKeyCredential } from "@azure/ai-text-analytics";
 
-const apiKey = process.env.TEXT_ANALYTICS_API_KEY || ""; // Use environment variable
-const endpoint = process.env.TEXT_ANALYTICS_ENDPOINT || ""; // Use environment variable
+const apiKey = import.meta.env.VITE_TEXT_ANALYTICS_API_KEY || ""; // Use environment variable
+const endpoint = import.meta.env.VITE_TEXT_ANALYTICS_ENDPOINT || ""; // Use environment variable
 const client = new TextAnalyticsClient(endpoint, new AzureKeyCredential(apiKey));
 
 async function customEntityExtraction(text: string) {
-    const customEntityExtractionDeploymentName = process.env.EXPO_PUBLIC_CUSTOM_ENTITY_EXTRACTION_DEPLOYMENT_NAME || "";
-    const customEntityExtractionProjectName = process.env.EXPO_PUBLIC_CUSTOM_ENTITY_EXTRACTION_PROJECT_NAME || "";
+    const customEntityExtractionDeploymentName = import.meta.env.VITE_CUSTOM_ENTITY_EXTRACTION_DEPLOYMENT_NAME || "";
+    const customEntityExtractionProjectName = import.meta.env.VITE_CUSTOM_ENTITY_EXTRACTION_PROJECT_NAME || "";
 
     const actions = {
         recognizeCustomEntitiesActions: [
@@ -23,7 +23,7 @@ async function customEntityExtraction(text: string) {
 
     const document = [text];
 
-    const poller = await client.beginAnalyzeActions(text, actions, "en", {
+    const poller = await client.beginAnalyzeActions(document, actions, "en", {
         includeStatistics: true
     });
     const resultPages = await poller.pollUntilDone();
