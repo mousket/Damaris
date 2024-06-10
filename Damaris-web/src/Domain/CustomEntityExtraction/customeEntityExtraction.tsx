@@ -1,13 +1,13 @@
 
 const { TextAnalyticsClient, AzureKeyCredential } = require("@azure/ai-text-analytics");
 
-const apiKey = process.env.EXPO_PUBLIC_TEXT_ANALYTICS_API_KEY || "";
-const endpoint = process.env.EXPO_PUBLIC_TEXT_ANALYTICS_ENDPOINT || "";
+const apiKey = import.meta.env.VITE_TEXT_ANALYTICS_API_KEY || "";
+const endpoint = import.meta.env.VITE_TEXT_ANALYTICS_ENDPOINT || "";
 const client = new TextAnalyticsClient(endpoint, new AzureKeyCredential(apiKey));
 
 export async function customEntityExtraction(text: string) {
 
-    const results = await client.recognizeEntities(text);
+    const results = await client.recognizeEntities([text]);
 
     let resultList: Record<string, string>[] = [];
     for (const result of results) {

@@ -156,25 +156,6 @@ export async function openAICall(request: string, isQna: boolean): Promise<strin
 		new AzureKeyCredential(openAIKEY)
 	);
 
-	// Configure completions options
-	const completionsOptions: GetChatCompletionsOptions = {
-		messages: [
-			{ role: "system", content: systemMessage },
-			{ role: "user", content: request }
-		],
-		maxTokens: 150,
-		temperature: 0.9,
-	};
-	const consideratePrompt = (isQna) ? reformatQnaMessage(prompt) : reformatSystemMessage(prompt);
-
-	let result = "";
-	/* A different way of getting the open AI data
-	// Generate the final response using Azure OpenAI
-	const { id, created, choices, usage } = await client.getCompletions(openAIDeployment, [consideratePrompt]);
-	//const { id, created, choices, usage } = await azureClient.completions({ prompt, model: openAIDeployment, max_tokens: 128});
-	result = choices[0].text.trim();
-	*/
-
 	// Get the response stream
 	const responseStream = await client.streamCompletions(
 		openAIDeployment,
@@ -182,11 +163,37 @@ export async function openAICall(request: string, isQna: boolean): Promise<strin
 		completionsOptions
 	);
 
-	// Capture the first response
-	for await (const response of responseStream) {
-		result = response.choices[0].text;
-		break; // Exit the loop after the first response
-	}
+	let result = "";
+	/*
+        // Capture the first response
+        let result = "";
+        for await (const response of responseStream) {
+            result = response.choices[0].text;
+            break; // Exit the loop after the first response
+        }
 
-	return response;
+        return result;
+     */
+
+	const gptBuffer: string[] = [];
+	for await (const completionUpdate of responseStream) {
+		const message = completionUpdate.choices[0]?.text;
+		if (!message) {
+			continue;
+		}
+
+		gptBuffer.push(message);
+
+		if (sentenceSeparators.some((separator) => message.includes(separator))) {
+			const sentence = gptBuffer.join("").trim();
+			if (sentence) {
+				result = sentence;
+				//System Text To Speech
+				await convertTextToSpeech(sentence);
+				gptBuffer.length = 0; // Clear the buffer
+			}
+		}
+		break;
+	}
+	return result;
 }

@@ -3,28 +3,38 @@ const { TextAnalyticsClient, AzureKeyCredential } = require("@azure/ai-text-anal
 
 const apiKey = process.env.EXPO_PUBLIC_TEXT_ANALYTICS_API_KEY || "";
 const endpoint = process.env.EXPO_PUBLIC_TEXT_ANALYTICS_ENDPOINT || "";
-const client = new TextAnalyticsClient(endpoint, new AzureKeyCredential(apiKey));
 
-export async function customEntityExtraction(text: string) {
 
-    const results = await client.recognizeEntities(text);
+async function customEntityExtraction(text: string) {
 
+    const client = new TextAnalyticsClient(endpoint, new AzureKeyCredential(apiKey));
+    const results = await client.recognizeEntities([text]);
+
+/*
     let resultList: Record<string, string>[] = [];
-    for (const result of results) {
-        console.log(`- Document ${result.id}`);
-        if (!result.error) {
-            console.log("\tRecognized Entities:");
-            for (const entity of result.entities) {
-                //console.log(`\t- Entity ${entity.text} of type ${entity.category}`);
-                const newList = processEntity(entity);
-                const mergedList = MergeTwoLists(resultList, newList);
-                resultList = mergedList;
-            }
-        } else console.error("\tError:", result.error);
+    if(results)
+    {
+        for (const result of results) {
+            if (!result.error) {
+                console.log("\tRecognized Entities:");
+                for (const entity of result.entities) {
+                    if( entity.confidenceScore > 0.75 &&
+                        (entity.category == "Address" ||  entity.category == "Quantity")
+                    ){
+                        const newList = processEntity(entity);
+                        const mergedList = MergeTwoLists(resultList, newList);
+                        resultList = mergedList;
+                    }
+
+                }
+            } else console.error("\tError:", result.error);
+        }
     }
+*/
 
     return resultList;
 }
+
 interface Entity {
     category: string;
     text: string;
@@ -62,10 +72,19 @@ function processEntity(entity: Entity): Record<string, string>[] {
 
         // Check for inches
         if (entity.text.includes('inches')) {
-            return [{ dimUnit: 'IN', dimValue: entity.text }];
+            return [{ dimUnit: 'IN', dimValue: entity.text.replace('inches', '').trim() }];
+        }
+
+        // Check for inches
+        if (entity.text.includes('inch')) {
+            return [{ dimUnit: 'IN', dimValue: entity.text.replace('inch', '').trim() }];
         }
 
         // Check for pounds
+        if (entity.text.includes('lbs') || entity.text.includes('pounds')) {
+            return [{ weightUnit: 'LB', weight: entity.text.replace('pounds', '').trim() }];
+        }
+
         if (entity.text.includes('lb') || entity.text.includes('pound')) {
             return [{ weightUnit: 'LB', weight: entity.text.replace('pound', '').trim() }];
         }
@@ -91,3 +110,5 @@ function MergeTwoLists<T>(list1: T[], list2: T[]): T[] {
 
     return combinedList;
 }
+
+export default customEntityExtraction;
