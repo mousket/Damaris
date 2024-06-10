@@ -26,6 +26,7 @@ import {askOpenAI, openAICall} from "../Components/AzureOpenAI/openAI";
 import customEntityExtraction from "../Components/CustomEntityExtraction/customeEntityExtraction";
 import {getGeneralUserSentiment} from "../Components/Sentiment/sentiment";
 import {getAnswersFromQNA} from "../Components/QnA/qna";
+import bearerTokenRequest from "../API/bearerTokenRequest";
 
 
 const AudioRecord = () => {
@@ -124,7 +125,11 @@ const AudioRecord = () => {
 					"CSR: You’re welcome, Sally! Have a great day, and safe shipping!\n" +
 					"\n" ;
 
+				const bearer = await bearerTokenRequest();
+				console.log(bearer);
+				/*
 				query = await transcribeAudioFromMicrophone();
+
 				console.log("User Message: " + query);
 			 	//let sentimentScore = await getSentimentScore(query);
 				//let userTone = await getGeneralUserSentiment();
@@ -137,7 +142,7 @@ const AudioRecord = () => {
 
 				const systemReply2 = await openAICall(query, true);
 				convertTextToSpeech(systemReply2);
-
+				*/
 
 			//This is what we will use to Give a voice to the system when it talks to the user
 			 //convertTextToSpeech(transcription);
