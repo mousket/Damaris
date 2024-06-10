@@ -15,6 +15,7 @@ import {
 } from "microsoft-cognitiveservices-speech-sdk";
 
 import {getGeneralUserSentiment, reformatQnaMessage, reformatSystemMessage} from "../Sentiment/sentiment"
+import convertTextToSpeech from "@/Domain/Speech/textToAudio";
 
 // Initialize the OpenAI client
 const openAIEndPoint = import.meta.env.VITE_AZ_OPENAI_ENDPOINT || "";
@@ -69,7 +70,7 @@ export async function askOpenAI(prompt: string): Promise<void> {
 	};
 
 	// Craft the considerate prompt
-	const consideratePrompt = reformatSystemPrompt(prompt);
+	const consideratePrompt = reformatSystemMessage(prompt);
 
 	const responseStream = await client.streamCompletions(
 		openAIDeployment,
@@ -91,11 +92,11 @@ export async function askOpenAI(prompt: string): Promise<void> {
             if (sentence) {
                 console.log(sentence);
                 //System Text To Speech
-                await speechSynthesizer.speakTextAsync(sentence);
+                await convertTextToSpeech(sentence);
                 gptBuffer.length = 0; // Clear the buffer
             }
         }
-		break;
+
     }
 }
 

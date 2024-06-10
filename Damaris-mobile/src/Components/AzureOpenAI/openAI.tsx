@@ -48,7 +48,7 @@ const systemMessage =
 " Remember, I'm not just a robot; I'm a shipping enthusiast with a dash of humor. " +
 "I promise I won't make up stories—I'll just admit it and maybe crack a joke. Let's sail through this together!";
 
-export async function askOpenAI(prompt: string): Promise<void> {
+export async function askOpenAI(prompt: string): Promise<string> {
     const speechConfig = SpeechConfig.fromSubscription(speechKey, speechRegion);
 
     // The language of the voice that speaks.
@@ -66,19 +66,39 @@ export async function askOpenAI(prompt: string): Promise<void> {
     );
     const completionsOptions: GetChatCompletionsOptions = {
         messages: [{ role: "system", content: systemMessage },
-            {role: "user", content: request}
+            {role: "user", content: prompt},
         ],
-        //deploymentName: openAIDeployment,
         maxTokens: 400,
         temperature: 0.1,
     };
 
     // Craft the considerate prompt
-    const consideratePrompt = await reformatSystemPrompt(prompt);
+    const consideratePrompt = await reformatSystemMessage(prompt);
+
+    const responseStream = await client.getChatCompletions(
+        openAIDeployment,
+        prompt,
+        completionsOptions
+    );
+
+    const result = await client.getChatCompletions(openAIDeployment, [
+        { role: "system", content: systemMessage },
+        { role: "user", content: "Can you help me?" },
+        { role: "assistant", content: "I'm to listen and help you make the best decision related to shipping?" },
+        { role: "user", content: prompt },
+    ]);
+
+    for (const choice of result.choices) {
+        console.log(choice.message);
+    }
+    await convertTextToSpeech(result.choices[0].content);
+
+    /*
+
 
     const responseStream = await client.streamCompletions(
         openAIDeployment,
-        [consideratePrompt],
+        prompt,
         completionsOptions
     );
     const gptBuffer: string[] = [];
@@ -96,12 +116,13 @@ export async function askOpenAI(prompt: string): Promise<void> {
             if (sentence) {
                 console.log(sentence);
                 //System Text To Speech
-                await speechSynthesizer.speakTextAsync(sentence);
+                await convertTextToSpeech(sentence);
+                console.log(sentence);
                 gptBuffer.length = 0; // Clear the buffer
             }
         }
-        break;
-    }
+
+    } */
 }
 
 export async function chatWithOpenAI(): Promise<void> {

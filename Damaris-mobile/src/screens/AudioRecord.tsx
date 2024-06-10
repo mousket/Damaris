@@ -124,15 +124,16 @@ const AudioRecord = () => {
 					"CSR: You’re welcome, Sally! Have a great day, and safe shipping!\n" +
 					"\n" ;
 
-				//query = await transcribeAudioFromMicrophone();
-				//console.log("User Message: " + query);
+				query = await transcribeAudioFromMicrophone();
+				console.log("User Message: " + query);
 			 	//let sentimentScore = await getSentimentScore(query);
 				//let userTone = await getGeneralUserSentiment();
 				//console.log("Sentiment Analysis user message:  " + userTone + ": " + sentimentScore);
 
 			     //const entity = await customEntityExtraction(query);
 
-				await getAnswersFromQNA();
+				const systemReply = await askOpenAI(query);
+				await convertTextToSpeech(systemReply);
 
 				//console.log(entity);
 

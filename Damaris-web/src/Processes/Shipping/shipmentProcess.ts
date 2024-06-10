@@ -79,13 +79,15 @@ class ShippingProcess {
 
 
     private async confirmShipment(): Promise<void> {
-        let confirmationString = `Now let me confirm the destination address. You said that the street address was "${this.addressLine1}" in ${this.cityTown}, ${this.stateProvince}, ${this.postalCode}.`;
+        let confirmationString = `Now let me confirm the destination address.
+         You said that the street address was "${this.addressLine1}" in ${this.cityTown}, ${this.stateProvince}, ${this.postalCode}.`;
 
         // Add more details for other members
         confirmationString += ` Your shipment is scheduled for ${this.dateOfShipment.toDateString()}.`;
         confirmationString += ` The dimensions of your parcel are ${this.parcelLength} ${this.dimUnit} (length), ${this.parcelWidth} ${this.dimUnit} (width), and ${this.parcelHeight} ${this.dimUnit} (height).`;
         confirmationString += ` The weight unit is ${this.weightUnit}.`;
-        confirmationString += ` Looks like we have all the information we need! Let’s get those rates! Could you kindly give me a big “yes” to proceed `;
+        confirmationString += ` Looks like we have all the information we need! 
+        Let’s get those rates! Could you kindly give me a big “yes” to proceed `;
 
         // The system prompts the confirmation to the user
         await convertTextToSpeech(confirmationString);
