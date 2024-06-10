@@ -14,7 +14,7 @@ import IntentForm from "./pages/IntentForm";
 import AudioIntent from "./pages/AudioIntent";
 import AudioShipping from "./pages/AudioShipping";
 import CarrerChoice from "./pages/CarrerChoice";
-import { createContext } from 'react';
+import { createContext } from "react";
 import getSentimentScore from "@/Domain/Sentiment/textSentimentAnalysis";
 
 interface UserReply {
@@ -24,34 +24,33 @@ interface UserReply {
 
 interface ReplyContext {
 	userReplies: UserReply[];
-    handleAddUserReply: (reply : string) => void;
-    handleClearUserReply: () => void;
+	handleAddUserReply: (reply: string) => void;
+	handleClearUserReply: () => void;
 }
 
 export const UserRepliesContext = createContext<ReplyContext | null>(null);
 
-const userReplies : UserReply[] = [];
+const userReplies: UserReply[] = [];
 
 const handleClearUserReply = () => {
 	userReplies.splice(0, userReplies.length);
+};
 
-}
-
-const handleAddUserReply = async (reply : string) => {
+const handleAddUserReply = async (reply: string) => {
 	const score = await getSentimentScore(reply);
 
 	userReplies.push({
 		Reply: reply,
-        Sentiment: score!,
+		Sentiment: score!,
 	});
 	console.log("userReplies", userReplies);
 };
 
 const userRepliesContextValue = {
 	userReplies,
-    handleAddUserReply,
-    handleClearUserReply,
-}
+	handleAddUserReply,
+	handleClearUserReply,
+};
 
 const router = createBrowserRouter(
 	createRoutesFromElements(

@@ -110,7 +110,7 @@ const rateRequest: RateRequest = {
 	carrierAccounts: ["jg5Z5pgl29A"],
 	parcelType: "MED_EXP_BOX",
 	parcelId: "MED_EXP_BOX",
-	serviceId: "",//"NDA_AM",
+	serviceId: "", //"NDA_AM",
 	toAddress: {
 		addressLine1: "",
 		addressLine2: "*",
@@ -125,6 +125,31 @@ const rateRequest: RateRequest = {
 		residential: true,
 		stateProvince: "",
 	},
+};
+
+export type RateDetails = {
+	baseCharge: number;
+	carrier: string;
+	carrierAccount: string;
+	currencyCode: string;
+	deliveryCommitment: {
+		additionalDetails: string;
+		estimatedDeliveryDateTime: string;
+		guarantee: string;
+	};
+	parcelType: string;
+	rateTypeId: string;
+	serviceId: string;
+	surcharges: {
+		fee: number;
+		name: string;
+	}[];
+	totalCarrierCharge: number;
+	isHazmat: boolean;
+};
+
+export type RateResponse = {
+	rates: RateDetails[];
 };
 
 const shipmentRates = getShipmentRate(rateRequest);

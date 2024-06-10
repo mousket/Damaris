@@ -25,9 +25,11 @@ import {
 } from "@/components/ui/accordion";
 import { AccordionItem } from "@radix-ui/react-accordion";
 import { Switch } from "@/components/ui/switch";
+import { getShipmentRate } from "@/API/Shipment/rate";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
-	dateOfShipment: z.string().datetime(),
+	dateOfShipment: z.string().date(),
 	fromAddress: z.object({
 		addressLine1: z.string(),
 		addressLine2: z.string(),
@@ -40,14 +42,16 @@ const formSchema = z.object({
 		stateProvince: z.string(),
 	}),
 	parcel: z.object({
-		height: z.number(),
-		length: z.number(),
-		width: z.number(),
+		height: z.coerce.number(),
+		length: z.coerce.number(),
+		width: z.coerce.number(),
 		dimUnit: z.string(),
 		weightUnit: z.string(),
-		weight: z.number(),
+		weight: z.coerce.number(),
 	}),
-	carrierAccounts: z.array(z.object({ name: z.string() })),
+	carrierAccounts: z.array(
+		z.object({ name: z.string().min(1, "Enter a valid carrier account") })
+	),
 	parcelType: z.string(),
 	parcelId: z.string(),
 	toAddress: z.object({
@@ -64,6 +68,7 @@ const formSchema = z.object({
 });
 
 const ShippingForm = () => {
+	const navigate = useNavigate();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -109,15 +114,58 @@ const ShippingForm = () => {
 		control: form.control,
 	});
 
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		// Do something with the form values.
-		// ✅ This will be type-safe and validated.
-		console.log(values);
+	async function onSubmit(values: z.infer<typeof formSchema>) {
+		const request: RateRequest = {
+			dateOfShipment: values.dateOfShipment,
+			fromAddress: {
+				addressLine1: values.fromAddress.addressLine1,
+				addressLine2: values.fromAddress.addressLine2,
+				addressLine3: values.fromAddress.addressLine3,
+				cityTown: values.fromAddress.cityTown,
+				company: "",
+				countryCode: "",
+				email: values.fromAddress.email,
+				name: "",
+				phone: values.fromAddress.phone,
+				postalCode: values.fromAddress.postalCode,
+				stateProvince: values.fromAddress.stateProvince,
+				residential: values.fromAddress.residential ?? false,
+			},
+			parcel: {
+				height: values.parcel.height,
+				length: values.parcel.length,
+				width: values.parcel.width,
+				dimUnit: values.parcel.dimUnit,
+				weightUnit: values.parcel.weightUnit,
+				weight: values.parcel.weight,
+			},
+			carrierAccounts: values.carrierAccounts.map(x => x.name),
+			parcelType: values.parcelType,
+			parcelId: values.parcelId,
+			serviceId: "",
+			toAddress: {
+				addressLine1: values.toAddress.addressLine1,
+				addressLine2: values.toAddress.addressLine2,
+				addressLine3: values.toAddress.addressLine3,
+				cityTown: values.toAddress.cityTown,
+				company: "",
+				countryCode: "",
+				email: values.toAddress.email,
+				name: "",
+				phone: values.toAddress.phone,
+				postalCode: values.toAddress.postalCode,
+				stateProvince: values.toAddress.stateProvince,
+				residential: values.toAddress.residential ?? false,
+			},
+		};
+
+		const response = await getShipmentRate(request);
+		navigate("/carrerchoice", { state: response });
 	}
 
 	return (
 		<div className="h-full flex flex-col justify-center items-center">
-			<Card className="bg-white/70 min-w-[500px]">
+			<Card className="bg-white/70 min-w-[500px] w-full sm:w-2/3 overflow-scroll">
 				<CardHeader>
 					<CardTitle>Shipping command</CardTitle>
 					<CardDescription>Enter the shipping informations</CardDescription>
@@ -247,7 +295,6 @@ const ShippingForm = () => {
 														<Switch
 															checked={field.value}
 															onCheckedChange={field.onChange}
-															disabled
 															aria-readonly
 														/>
 													</FormControl>
@@ -377,7 +424,6 @@ const ShippingForm = () => {
 														<Switch
 															checked={field.value}
 															onCheckedChange={field.onChange}
-															disabled
 															aria-readonly
 														/>
 													</FormControl>
@@ -492,24 +538,28 @@ const ShippingForm = () => {
 								</AccordionItem>
 							</Accordion>
 							{fields.map((field, index) => (
-								<div key={field.id}>
+								<div className="flex gap-4 items-end" key={field.id}>
 									<FormField
 										control={form.control}
 										name={`carrierAccounts.${index}.name`}
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>Package weight</FormLabel>
+												<FormLabel>carrier accounts</FormLabel>
 												<FormControl>
-													<Input placeholder="ounces" {...field} />
+													<Input placeholder="carrer..." {...field} />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
 										)}
 									/>
 									{index > 0 && (
-										<Button onClick={() => remove(index)}>-</Button>
+										<Button type="button" onClick={() => remove(index)}>
+											-
+										</Button>
 									)}
-									<Button onClick={() => append({ name: "" })}>+</Button>
+									<Button type="button" onClick={() => append({ name: "" })}>
+										+
+									</Button>
 								</div>
 							))}
 							<FormField
