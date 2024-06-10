@@ -19,7 +19,7 @@ configure(): void {
     // Create a model for date of shipment
     const dateModel = new Model("dateOfShipment", "Prompt for date of shipment");
     dateModel.prompt = new Input<string>(
-        "dateOfShipment",
+        "DateTime",
         "A prompt to ask for the date of shipment",
         this.item.dateOfShipment,
         (value: string) => {
@@ -33,10 +33,10 @@ configure(): void {
     const rateModel = new Model("toAddress", "Prompt for the destination address");
     rateModel.prompt = new Input<string>(
         "addressLine1",
-        "A prompt to ask for the rateModel line 1",
-        this.item.fromAddress.addressLine1,
+        "A prompt to ask for the address line 1",
+        this.item.fromAddress!.addressLine1,
         (value: string) => {
-            this.item.fromAddress.addressLine1 = value;
+            this.item.fromAddress!.addressLine1 = value;
         }
     );
 

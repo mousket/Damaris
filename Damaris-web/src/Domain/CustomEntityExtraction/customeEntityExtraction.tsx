@@ -10,7 +10,6 @@ export async function customEntityExtraction(text: string) {
     const results = await client.recognizeEntities([text]);
 
     let resultList: Record<string, string>[] = [];
-    console.log("results", results);
     for (const result of results) {
         console.log(`- Document ${result.id}`);
         if (!result.error) {
@@ -23,13 +22,7 @@ export async function customEntityExtraction(text: string) {
             }
         } else console.error("\tError:", result.error);
     }
-
-    return new Promise<Record<string, string>[]>((resolve, reject) => {
-        if(resultList.length > 0) {
-            resolve(resultList);
-        }
-        else reject([])
-    })
+    return resultList;
 }
 
 export default customEntityExtraction;
@@ -86,6 +79,9 @@ function processEntity(entity: Entity): Record<string, string>[] {
         }
     } else if (entity.category === 'Email') {
         return [{ email: entity.text }];
+    }
+    else {
+        return [{ [entity.category] : entity.text }];
     }
 
     return [];

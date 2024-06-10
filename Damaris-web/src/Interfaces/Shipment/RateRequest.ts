@@ -1,5 +1,5 @@
 export default interface RateRequest {
-    parcel: {
+    parcel?: {
 		length?: number,
 		width?: number,
 		dimUnit?: string,
@@ -8,7 +8,7 @@ export default interface RateRequest {
 		weightUnit?: string,
 	},
 	parcelType?: string,
-	fromAddress: {
+	fromAddress?: {
 		residential?: boolean,
 		phone?: string,
 		countryCode?: string,

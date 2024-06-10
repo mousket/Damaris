@@ -1,4 +1,3 @@
-import {getAnswersFromQNA} from "@/Domain/QnA/qna";
 import AudioRecord from "@/components/shipping/AudioRecord";
 import {
 	Card,
@@ -10,10 +9,13 @@ import {
 import { useEffect, useState } from "react";
 import RateScheme from "@/Schemes/RateScheme";
 import customEntityExtraction from "@/Domain/CustomEntityExtraction/customeEntityExtraction";
+import Prompt from "@/Base/Prompt";
 
 const AudioShipping = () => {
 	const [handlePrompt, setHandlePrompt] = useState<{ prompt: string, handleResponse: (text: string) => Promise<boolean>} | null | undefined>(null);
 	const [modelIdx, setModelIdx] = useState<number>(0);
+	const [currentPrompt, setCurrentPrompt] = useState<Prompt<unknown> | null>(null)
+
 	const rateScheme = new RateScheme(
 		{
 			parcel: {
@@ -61,23 +63,73 @@ const AudioShipping = () => {
 	);
 
 	useEffect(() => {
-		handleModelPrompt(rateScheme.models[1].hint);
-		rateScheme.models[1]
-	}, []);
+		handleModelPrompt();
+	}, [modelIdx]);
 
-	const handleModelPrompt = (text: string) => {
+	useEffect(() => {
+		if(currentPrompt)
+			handleCurrentPrompt();
+	}, [currentPrompt])
+
+	const handleModelPrompt = () => {
 		setHandlePrompt({
-			prompt: text,
+			prompt: rateScheme.models[modelIdx].hint,
 			handleResponse: async (text: string) => {
 				// extract entities
-				console.log("there", text);
 				const result = await customEntityExtraction(text);
-				console.log(text, result);
+				console.log("results", result);
 				return new Promise<boolean>((resolve, reject) => {
-					
+					if(result.length === 0) {
+						reject(false);
+					}
+					else {
+						rateScheme.models[modelIdx].setEntities(result);
+						const prompt = getNextUnsetPrompt(rateScheme.models[modelIdx].prompt)
+						console.log("prompt", prompt);
+						if(prompt) setCurrentPrompt(prompt);
+						else if (!prompt && rateScheme.models.length > modelIdx + 1) {
+							setModelIdx(modelIdx + 1);
+						}
+						resolve(true);	
+					} 
 				});
 			}
 		})
+	}
+
+	const handleCurrentPrompt = () => {
+		setHandlePrompt({
+			prompt: currentPrompt!.hint,
+			handleResponse: async (text: string) => {
+				// extract entities
+				const result = await customEntityExtraction(text);
+				return new Promise<boolean>((resolve, reject) => {
+					if(result.length === 0) {
+						reject(false);
+					}
+					else {
+						if(currentPrompt?.setValue(Object.values(result[0])[0])) {
+							resolve(true);
+							const prompt = getNextUnsetPrompt(currentPrompt)
+							if(prompt) setCurrentPrompt(prompt)
+							else if(!prompt && rateScheme.models.length > modelIdx + 1) {
+								setModelIdx(modelIdx + 1);
+							}
+						}
+						else
+							reject(false);
+					} 
+				});
+			}
+		})
+	}
+
+	const getNextUnsetPrompt = (prompt : Prompt<any>) => {
+		let currentPrompt = prompt
+		while(currentPrompt && currentPrompt.isSet ) {
+			currentPrompt = currentPrompt.getNextPrompt()!;
+		}
+		return currentPrompt;
 	}
 	
 	return (

@@ -3,6 +3,7 @@ import { UserRepliesContext } from "@/main";
 import { useState, useContext, useEffect } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { openAICall } from "@/Domain/AzureOpenAI/openAI";
+import convertTextToSpeech from "@/Domain/Speech/textToAudio";
 
 enum AiState {
 	IS_RECORDING, IS_SPEAKING, IS_LOADING, NONE
@@ -31,12 +32,20 @@ const AudioRecord = ({
 		if(handlePrompt) {
 			setAiState(AiState.IS_LOADING)
 			// Rephrase prompt and play for user
-			//openAICall(handlePrompt.prompt, false)
-			// text to speech
-			// setSpeech
-			setAiState(AiState.IS_SPEAKING)
-			// After speaking
-			setAiState(AiState.IS_RECORDING)
+			openAICall(handlePrompt.prompt, false)
+				.then(async (result) => {
+					// text to speech
+					// setSpeech
+					setAiState(AiState.IS_SPEAKING)
+					console.log("ai ask", result)
+					await convertTextToSpeech(result);
+					// After speaking
+					setAiState(AiState.IS_RECORDING)
+				}).catch(async (error) => {
+					setText(handlePrompt.prompt);
+					console.log("can't get prompt");
+					setAiState(AiState.IS_RECORDING)
+				});
 		}
 	};
 	
