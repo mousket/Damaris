@@ -40,9 +40,11 @@ async function transcribeAudioFromMicrophone(): Promise<string> {
 	}
 }
 
+/*
 // Example usage:
 transcribeAudioFromMicrophone()
 	.then(transcription => console.log("Transcription:", transcription))
 	.catch(error => console.error("Error:", error));
 
+*/
 export default transcribeAudioFromMicrophone;
