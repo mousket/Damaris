@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 async function fetchPitneyBowesBearerToken(): Promise<void> {
 	try {
 		//API INFO

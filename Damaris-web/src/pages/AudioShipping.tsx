@@ -70,7 +70,7 @@ const AudioShipping = () => {
 			prompt: text,
 			handleResponse: async (text: string) => {
 				// extract entities
-				console.log(text);
+				console.log("there", text);
 				const result = await customEntityExtraction(text);
 				console.log(text, result);
 				return new Promise<boolean>((resolve, reject) => {

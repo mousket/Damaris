@@ -31,7 +31,7 @@ const AudioRecord = ({
 		if(handlePrompt) {
 			setAiState(AiState.IS_LOADING)
 			// Rephrase prompt and play for user
-			let result = await openAICall(handlePrompt.prompt, false)
+			//openAICall(handlePrompt.prompt, false)
 			// text to speech
 			// setSpeech
 			setAiState(AiState.IS_SPEAKING)
