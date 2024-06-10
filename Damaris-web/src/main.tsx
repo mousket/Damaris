@@ -57,9 +57,10 @@ const router = createBrowserRouter(
 		<Route path="/" element={<MainLayout />}>
 			<Route index element={<IntentForm />} />
 			<Route path="/shipform" element={<ShippingForm />} />
-			<Route path="/audio" element={<AudioIntent />} />
+			{/*<Route path="/audio" element={<AudioIntent />} />
 			<Route path="/audioshipping" element={<AudioShipping />} />
 			<Route path="/carrierchoice" element={<CarrierChoice />} />
+			*/}
 		</Route>
 	)
 );

@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 const IntentForm = () => {
 	return (
 		<div className="h-full flex flex-col justify-center items-center">
-			<Card className=" bg-white/70">
+			<Card className=" bg-white/70 w-5/6">
 				<CardHeader>
 					<CardTitle>Main menu</CardTitle>
 					<CardDescription>Please choose your intent</CardDescription>
