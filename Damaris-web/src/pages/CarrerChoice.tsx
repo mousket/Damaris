@@ -9,31 +9,36 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Swal from "sweetalert2";
+import { rateResponse } from "@/API/Examples/ResponseExample";
 
 const CarrerChoice = () => {
-	const { state } = useLocation();
-	const res = state as RateResponse;
+	// const { state } = useLocation();
+	// const res = state as RateResponse;
+
+	const res = rateResponse;
 
 	return (
-		<Card>
-			<CardHeader>
+		<Card className="bg-white/35 overflow-scroll">
+			<CardHeader className="text-center">
 				<CardTitle>Please choose the plan that befits you</CardTitle>
 				<CardDescription>
 					In the options below, please choose the plan you think that brings you
 					the most benefits
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="grid gap-4">
+			<CardContent className="grid gap-4 overflow-scroll">
 				{res.rates.map((rate, index) => (
 					<Button
+						className="overflow-scroll h-full w-full bg-white hover:bg-gray-300"
 						onClick={() =>
 							Swal.fire({
 								title: `You chose ${rate.carrier} for your shipping`,
 								text: "You made an excelent choice for your shipping. Please visit us more often",
+								icon: "success",
 							})
 						}
 						key={index}
-						type="submit"
+						type="button"
 					>
 						<CarrerCard rateDetails={rate} />
 					</Button>
@@ -45,9 +50,11 @@ const CarrerChoice = () => {
 
 const CarrerCard = ({ rateDetails }: { rateDetails: RateDetails }) => {
 	return (
-		<Card>
+		<Card className="w-full text-left bg-transparent">
 			<CardHeader>
-				<CardTitle>{rateDetails.carrier}</CardTitle>
+				<CardTitle className="uppercase text-center text-2xl sm:text-5xl">
+					{rateDetails.carrier}
+				</CardTitle>
 			</CardHeader>
 			<CardContent className="grid gap-4">
 				<div className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
