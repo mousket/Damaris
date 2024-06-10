@@ -6,7 +6,8 @@ import { NavigateFunction, useNavigate } from "react-router-dom";
 const AudioRecord = ({
 	handleText,
 }: {
-	handleText: (text: string, navigate: NavigateFunction) => Promise<any>;
+	handleText?: (text: string, navigate: NavigateFunction) => Promise<unknown>;
+	handlePrompt?: { prompt: string, handleResponse: (text: string) => boolean};
 }) => {
 	const userRepliesContent = useContext(UserRepliesContext)
 	const [isRecording, setIsRecording] = useState(false);
@@ -21,7 +22,7 @@ const AudioRecord = ({
 			userRepliesContent?.handleAddUserReply(recognizedText)
 		}
 		setIsRecording(false);
-		await handleText(text, navigate);
+		if(handleText) await handleText(text, navigate);
 	};
 
 	return (
