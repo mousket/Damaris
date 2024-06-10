@@ -1,18 +1,35 @@
 import transcribeAudioFromMicrophone from "@/Domain/Speech/audioToText";
 import { UserRepliesContext } from "@/main";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
+
+enum AiState {
+	IS_RECORDING, IS_SPEAKING, IS_LOADING, NONE
+}
 
 const AudioRecord = ({
 	handleText,
+	handlePrompt
 }: {
-	handleText?: (text: string, navigate: NavigateFunction) => Promise<unknown>;
-	handlePrompt?: { prompt: string, handleResponse: (text: string) => boolean};
+	handleText?: (text: string, navigate: NavigateFunction) => Promise<unknown>,
+	handlePrompt?: { prompt: string, handleResponse: (text: string) => Promise<boolean>} | null
 }) => {
 	const userRepliesContent = useContext(UserRepliesContext)
 	const [isRecording, setIsRecording] = useState(false);
 	const [text, setText] = useState("");
+	const [aiState, setAiState] = useState<AiState>(AiState.NONE)
+	const [speech, setSpeech] = useState<string | null> (null);
 	const navigate = useNavigate();
+
+	// TODO: handle prompts
+	useEffect(() => {
+		if(handlePrompt) {
+			setAiState(AiState.IS_LOADING)
+			// Rephrase prompt and play for user
+			// text to speech
+			// setSpeech
+		}
+	}, [handlePrompt])
 
 	const record = async () => {
 		setIsRecording(true);
@@ -32,6 +49,7 @@ const AudioRecord = ({
 				<button
 					onClick={record}
 					className={`${isRecording ? "animate-spin" : ""}`}
+					disabled={aiState === AiState.IS_LOADING || aiState === AiState.IS_SPEAKING }
 				>
 					<img src="src/assets/interaction.png" />
 				</button>

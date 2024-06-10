@@ -7,7 +7,7 @@ export default interface RateRequest {
 		height?: number,
 		weightUnit?: string,
 	},
-	parcelType: string,
+	parcelType?: string,
 	fromAddress: {
 		residential?: boolean,
 		phone?: string,
@@ -22,8 +22,8 @@ export default interface RateRequest {
 		addressLine3?: string,
 		email?: string,
 	},
-	dateOfShipment: string,
-	serviceId: string,
+	dateOfShipment?: string,
+	serviceId?: string,
 	toAddress: {
 		residential?: boolean,
 		phone?: string,

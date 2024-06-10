@@ -10,13 +10,8 @@ import {
 import { useEffect, useState } from "react";
 import RateScheme from "@/Schemes/RateScheme";
 
-interface HandlePrompt {
-	prompt: string,
-	handleResponse?: (text: string) => boolean
-}
-
 const AudioShipping = () => {
-	const [handlePrompt, setHandlePrompt] = useState<HandlePrompt | null>(null);
+	const [handlePrompt, setHandlePrompt] = useState<{ prompt: string, handleResponse: (text: string) => Promise<boolean>} | null | undefined>(null);
 	const [modelIdx, setModelIdx] = useState<number>(0);
 	const rateScheme = new RateScheme(
 		{
@@ -65,15 +60,21 @@ const AudioShipping = () => {
 	);
 
 	useEffect(() => {
-		setHandlePrompt({
-			prompt: rateScheme.models[1].hint,
-			handleResponse: (text: string) => {
-				// extract entities
-				return true
-			}
-		})
+		handleModelPrompt(rateScheme.models[1].hint);
 		rateScheme.models[1]
 	}, []);
+
+	const handleModelPrompt = (text: string) => {
+		setHandlePrompt({
+			prompt: text,
+			handleResponse: async (text: string) => {
+				// extract entities
+				return new Promise<boolean>((resolve, reject) => {
+					
+				});
+			}
+		})
+	}
 	
 	return (
 		<div className="h-full flex flex-col justify-center items-center">
@@ -86,7 +87,7 @@ const AudioShipping = () => {
 				</CardHeader>
 				<CardContent className="grid gap-4">
 					<div>
-						<AudioRecord />;
+						<AudioRecord handlePrompt={handlePrompt}/>;
 					</div>
 				</CardContent>
 			</Card>
