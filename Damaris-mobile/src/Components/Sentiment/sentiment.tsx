@@ -59,7 +59,7 @@ function computeOverallSentiment(): number | null {
     *
      */
 
-    return 0.8;
+    return 0.2;
 }
 
 //Use to improve System Replies and questions to the user.
@@ -81,48 +81,24 @@ export function reformatQnaMessage(baseRequest: string): string {
     const prompt = `
         Generate an appropriate and sensitive message to a user's mood following the format below:
         
-        Mood: Happy
+        Mood: 0.85
         Baserequest: Ask for your shipping address?
         Response: Thank you so much. I’m glad to have been of service. Now, can you let me know to what address you're thinking about shipping your item?
         
-        Mood: Curious
+        Mood: 0.6
         Baserequest: Ask for your shipping address?
         Response: Certainly! It’s great to assist you. If you have any specific questions or need help with anything, feel free to ask. 
         
-        Mood: Frustrated
+        Mood: 0.25
         Baserequest: Ask for your shipping address?
         Response: I apologize for any confusion, but it seems there might be a mix-up. 
         The requests you’ve mentioned appear to be related to shipping addresses, but I don’t have any context or specific item to ship.
         Could you please provide more details or clarify your request? I’d be happy to assist! 
         
-        Mood:` + mood + `
+        Mood: ` + mood + `
         Baserequest: ` + baseRequest + `
         Response: 
         `;
 
     return prompt;
 }
-
-/*
-//To answer question from the user
-export function reformatSystemPrompt(request: string): string {
-	// Customize the considerate prompt based on user tone and base request
-	// You can add more logic here as needed
-	const userTone = getGeneralUserSentiment();
-
-	const prompt =
-		`
-        Answer the question below as shortly as you can and modify your language to accommodate a customer be mindful of a who is feeling` +
-		userTone +
-		`.` +
-		`
-        --------
-        ` +
-		request +
-		`
-        ------------
-        `;
-
-	return prompt;
-}
-*/
