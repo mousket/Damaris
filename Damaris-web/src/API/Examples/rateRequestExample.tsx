@@ -84,4 +84,4 @@ const rateRequestSecondExample: RateRequest = {
 		stateProvince: "IMPORTANT",
 	},
 };
-console.log(rateRequestSecondExample.carrierAccounts);
+// console.log(rateRequestSecondExample.carrierAccounts);

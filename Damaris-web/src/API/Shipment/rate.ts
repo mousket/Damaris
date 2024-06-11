@@ -153,4 +153,4 @@ export type RateResponse = {
 };
 
 const shipmentRates = getShipmentRate(rateRequest);
-console.log(shipmentRates); // Modify this to process the rate data as needed
+// console.log(shipmentRates); // Modify this to process the rate data as needed
