@@ -1,4 +1,5 @@
 import transcribeAudioFromMicrophone from "@/Domain/Speech/audioToText";
+import convertTextToSpeech from "@/Domain/Speech/textToAudio";
 import { UserRepliesContext } from "@/main";
 import { useState, useContext } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
@@ -8,8 +9,9 @@ const AudioRecord = ({
 }: {
 	handleText: (text: string, navigate: NavigateFunction) => Promise<any>;
 }) => {
-	const userRepliesContent = useContext(UserRepliesContext)
+	const userRepliesContent = useContext(UserRepliesContext);
 	const [isRecording, setIsRecording] = useState(false);
+	const [isTalking, setIsTalking] = useState(false);
 	const [text, setText] = useState("");
 	const navigate = useNavigate();
 
@@ -17,11 +19,14 @@ const AudioRecord = ({
 		setIsRecording(true);
 		const recognizedText = await transcribeAudioFromMicrophone();
 		setText(recognizedText);
-		if(recognizedText != "No speech detected.") {
-			userRepliesContent?.handleAddUserReply(recognizedText)
+		if (recognizedText != "No speech detected.") {
+			userRepliesContent?.handleAddUserReply(recognizedText);
 		}
 		setIsRecording(false);
-		await handleText(text, navigate);
+		setIsTalking(true);
+		await convertTextToSpeech(text);
+		setIsTalking(false);
+		// await handleText(text, navigate);
 	};
 
 	return (
@@ -30,7 +35,9 @@ const AudioRecord = ({
 				{" "}
 				<button
 					onClick={record}
-					className={`${isRecording ? "animate-spin" : ""}`}
+					className={`${isRecording ? "animate-spin" : ""} ${
+						isTalking ? "animate-bounce" : ""
+					}`}
 				>
 					<img src="src/assets/interaction.png" />
 				</button>
@@ -42,4 +49,5 @@ const AudioRecord = ({
 		</div>
 	);
 };
+
 export default AudioRecord;

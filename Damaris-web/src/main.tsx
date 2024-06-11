@@ -14,8 +14,10 @@ import IntentForm from "./pages/IntentForm";
 import AudioIntent from "./pages/AudioIntent";
 import AudioShipping from "./pages/AudioShipping";
 import CarrierChoice from "./pages/CarrierChoice";
-import { createContext } from 'react';
+import { createContext } from "react";
 import getSentimentScore from "@/Domain/Sentiment/textSentimentAnalysis";
+import QnAAudio from "./pages/QnAAudio";
+import QnAForm from "./pages/QnAForm";
 
 interface UserReply {
 	Reply: string;
@@ -55,11 +57,13 @@ const userRepliesContextValue = {
 const router = createBrowserRouter(
 	createRoutesFromElements(
 		<Route path="/" element={<MainLayout />}>
-			<Route index element={<IntentForm />} />
-			<Route path="/shipform" element={<ShippingForm />} />
-			<Route path="/audio" element={<AudioIntent />} />
+			<Route index element={<AudioIntent />} />
 			<Route path="/audioshipping" element={<AudioShipping />} />
+			<Route path="/audioqna" element={<QnAAudio />} />
+			<Route path="intentform" element={<IntentForm />} />
+			<Route path="/shipform" element={<ShippingForm />} />
 			<Route path="/carrierchoice" element={<CarrierChoice />} />
+			<Route path="/qnaform" element={<QnAForm />} />
 		</Route>
 	)
 );
