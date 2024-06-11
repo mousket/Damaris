@@ -57,11 +57,11 @@ const userRepliesContextValue = {
 const router = createBrowserRouter(
 	createRoutesFromElements(
 		<Route path="/" element={<MainLayout />}>
-			<Route index element={<IntentForm />} />
-			<Route path="/shipform" element={<ShippingForm />} />
-			{/*	<Route path="/audio" element={<AudioIntent />} />
+			<Route index element={<AudioIntent />} />
 			<Route path="/audioshipping" element={<AudioShipping />} />
-			<Route path="/carrierchoice" element={<CarrierChoice />} /> */}
+			<Route path="intentform" element={<IntentForm />} />
+			<Route path="/shipform" element={<ShippingForm />} />
+			<Route path="/carrierchoice" element={<CarrierChoice />} />
 		</Route>
 	)
 );
