@@ -77,7 +77,7 @@ export async function openAICall(request: string, isQna: boolean): Promise<strin
 	);
 
 	// Craft the considerate prompt (reformatSystemPrompt(prompt) should be defined elsewhere)
-	const consideratePrompt = (isQna) ? reformatQnaMessage(prompt) : reformatSystemMessage(prompt);
+	const consideratePrompt = (isQna) ? reformatQnaMessage(request) : reformatSystemMessage(request);
 
 
 	const result = await client.getChatCompletions(openAIDeployment, [
