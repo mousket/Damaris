@@ -24,7 +24,7 @@ async function getSpecialServices(
 			{
 				method: "GET",
 				headers: {
-					"X-PB-Developer-Partner-ID": "us",
+					"X-PB-Developer-Partner-ID": "",
 					Authorization: authorization,
 				},
 			}

@@ -165,7 +165,7 @@ const ShippingForm = () => {
 
 	return (
 		<div className="h-full flex flex-col justify-center items-center">
-			<Card className="bg-white/70 min-w-[500px] w-full sm:w-2/3 overflow-scroll">
+			<Card className="bg-white/70 min-w-[250px] 5/6 sm:w-2/3 overflow-scroll">
 				<CardHeader>
 					<CardTitle>Shipping command</CardTitle>
 					<CardDescription>Enter the shipping informations</CardDescription>

@@ -57,7 +57,7 @@ export async function getShipmentRate(rateRequest: RateRequest): Promise<any> {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					"X-PB-Developer-Partner-ID": "us",
+					"X-PB-Developer-Partner-ID": "",
 					compactResponse: "true",
 					Authorization: authorization,
 				},
