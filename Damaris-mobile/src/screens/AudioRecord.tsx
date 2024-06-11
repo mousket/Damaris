@@ -124,9 +124,6 @@ const AudioRecord = () => {
 					"\n" +
 					"CSR: You’re welcome, Sally! Have a great day, and safe shipping!\n" +
 					"\n" ;
-
-				const bearer = await bearerTokenRequest();
-				console.log(bearer);
 				/*
 				query = await transcribeAudioFromMicrophone();
 
