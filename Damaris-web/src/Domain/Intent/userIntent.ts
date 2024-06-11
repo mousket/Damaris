@@ -90,7 +90,11 @@ async function analyzeUserInputForDamarisIntent(
 				await convertTextToSpeech(systemReply);
 				break;
 			default:
-				console.log("Unknown intent:", topIntent);
+				// Implement logic for  a shipment based on the provided tracking number.
+				console.log("Handling Questions From the Customers intent...");
+				systemReply = await openAICall(text, true);
+				await convertTextToSpeech(systemReply);
+				break;
 		}
 	} catch (error) {
 		console.error("Error analyzing user input:", error);
