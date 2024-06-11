@@ -16,8 +16,6 @@ import AudioShipping from "./pages/AudioShipping";
 import CarrierChoice from "./pages/CarrierChoice";
 import { createContext } from "react";
 import getSentimentScore from "@/Domain/Sentiment/textSentimentAnalysis";
-import QnAAudio from "./pages/QnAAudio";
-import QnAForm from "./pages/QnAForm";
 
 interface UserReply {
 	Reply: string;

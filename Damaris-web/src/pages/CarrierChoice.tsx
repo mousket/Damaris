@@ -1,5 +1,5 @@
 // import { useLocation } from "react-router-dom";
-import type { RateDetails, RateResponse } from "@/API/Shipment/rate";
+import type { RateDetails } from "@/API/Shipment/rate";
 import {
 	Card,
 	CardContent,
