@@ -1,9 +1,9 @@
 import transcribeAudioFromMicrophone from "@/Domain/Speech/audioToText";
-import convertTextToSpeech from "@/Domain/Speech/textToAudio";
 import { UserRepliesContext } from "@/main";
 import { useState, useContext, useEffect } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { openAICall } from "@/Domain/AzureOpenAI/openAI";
+import convertTextToSpeech from "@/Domain/Speech/textToAudio";
 
 enum AiState {
 	IS_RECORDING, IS_SPEAKING, IS_LOADING, NONE
@@ -14,7 +14,7 @@ const AudioRecord = ({
 	handlePrompt
 }: {
 	handleText?: (text: string, navigate: NavigateFunction) => Promise<unknown>,
-	handlePrompt?: { prompt: string, handleResponse: (text: string) => Promise<boolean>} | null
+	handlePrompt?: { prompt: string, waitForResponse: boolean, handleResponse: (text?: string) => Promise<boolean>} | null
 }) => {
 	const userRepliesContent = useContext(UserRepliesContext);
 	const [isRecording, setIsRecording] = useState(false);
@@ -25,22 +25,19 @@ const AudioRecord = ({
 
 	// TODO: handle prompts
 	useEffect(() => {
-		if(handlePrompt) {
+		async function promptToSpeech() {
 			setAiState(AiState.IS_LOADING)
-			// Rephrase prompt and play for user
-			openAICall(handlePrompt.prompt, false)
-				.then(async (result) => {
-					// text to speech
-					// setSpeech
-					setAiState(AiState.IS_SPEAKING)
-					console.log("ai ask", result)
-					// await convertTextToSpeech(result);
-					// After speaking
-					setAiState(AiState.NONE)
-				}).catch(async (error) => {
-					console.log("can't get prompt", error.message);
-					setAiState(AiState.NONE)
-				});
+			if (handlePrompt && handlePrompt.prompt) {
+				const prompt = await openAICall(handlePrompt.prompt, false)
+				setText(prompt);
+				await convertTextToSpeech(prompt);
+				if(!handlePrompt.waitForResponse) {
+					handlePrompt.handleResponse();
+				}
+			}
+		}
+		if(handlePrompt) {
+			promptToSpeech();
 		}
 	}, [handlePrompt])
 	
@@ -63,7 +60,9 @@ const AudioRecord = ({
 				{" "}
 				<button
 					onClick={record}
-					className={`${isRecording ? "animate-spin" : ""}`}
+					className={`${isRecording ? "animate-spin" : ""} ${
+						isTalking ? "animate-bounce" : ""
+					}`}
 					disabled={aiState === AiState.IS_LOADING || aiState === AiState.IS_SPEAKING }
 				>
 					<img src="src/assets/interaction.png" />

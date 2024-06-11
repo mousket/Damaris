@@ -12,8 +12,8 @@ import customEntityExtraction from "@/Domain/CustomEntityExtraction/customeEntit
 import Prompt from "@/Base/Prompt";
 
 const AudioShipping = () => {
-	const [handlePrompt, setHandlePrompt] = useState<{ prompt: string, handleResponse: (text: string) => Promise<boolean>} | null | undefined>(null);
-	const [modelIdx, setModelIdx] = useState<number>(0);
+	const [handlePrompt, setHandlePrompt] = useState<{ prompt: string, waitForResponse: boolean, handleResponse: (text?: string) => Promise<boolean>} | null | undefined>(null);
+	const [modelIdx, setModelIdx] = useState<number | null>(null);
 	const [currentPrompt, setCurrentPrompt] = useState<Prompt<unknown> | null>(null)
 
 	const rateScheme = new RateScheme(
@@ -63,7 +63,21 @@ const AudioShipping = () => {
 	);
 
 	useEffect(() => {
-		handleModelPrompt();
+		setHandlePrompt({
+			prompt: "Greetings, I am here to help you set your shippment information in order to get you the available services. follow the next steps so we can get your parcel shipped",
+			waitForResponse: false,
+			handleResponse: async () => {
+				console.log("after greeetings");
+				setModelIdx(0);
+				return true;
+			}
+		});
+	}, [])
+
+	useEffect(() => {
+		console.log("begin");
+		if(modelIdx != null)
+			handleModelPrompt();
 	}, [modelIdx]);
 
 	useEffect(() => {
@@ -74,9 +88,10 @@ const AudioShipping = () => {
 	const handleModelPrompt = () => {
 		setHandlePrompt({
 			prompt: rateScheme.models[modelIdx].hint,
-			handleResponse: async (text: string) => {
+			waitForResponse: true,
+			handleResponse: async (text?: string) => {
 				// extract entities
-				const result = await customEntityExtraction(text);
+				const result = await customEntityExtraction(text!);
 				console.log("results", result);
 				return new Promise<boolean>((resolve, reject) => {
 					if(result.length === 0) {
@@ -100,9 +115,10 @@ const AudioShipping = () => {
 	const handleCurrentPrompt = () => {
 		setHandlePrompt({
 			prompt: currentPrompt!.hint,
-			handleResponse: async (text: string) => {
+			waitForResponse: true,
+			handleResponse: async (text?: string) => {
 				// extract entities
-				const result = await customEntityExtraction(text);
+				const result = await customEntityExtraction(text!);
 				return new Promise<boolean>((resolve, reject) => {
 					if(result.length === 0) {
 						reject(false);

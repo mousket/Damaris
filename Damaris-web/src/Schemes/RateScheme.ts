@@ -17,10 +17,10 @@ export default class RateScheme extends Scheme<RateRequest> {
  */
 configure(): void {
     // Create a model for date of shipment
-    const dateModel = new Model("dateOfShipment", "Prompt for date of shipment");
+    const dateModel = new Model("dateOfShipment", "What is the date of shipment?");
     dateModel.prompt = new Input<string>(
         "DateTime",
-        "A prompt to ask for the date of shipment",
+        "When will you ship your parcel?",
         this.item.dateOfShipment,
         (value: string) => {
             this.item.dateOfShipment = value;
@@ -30,7 +30,7 @@ configure(): void {
     this.models.push(dateModel);
 
     // Create a model for the toAddress
-    const rateModel = new Model("toAddress", "Prompt for the destination address");
+    const rateModel = new Model("toAddress", "What is the destination address?");
     rateModel.prompt = new Input<string>(
         "addressLine1",
         "A prompt to ask for the address line 1",

@@ -1,4 +1,3 @@
-//@ts-nocheck
 import {
 	AzureKeyCredential,
 	OpenAIClient
@@ -15,6 +14,7 @@ import {
 
 import {getGeneralUserSentiment, reformatQnaMessage, reformatSystemMessage} from "../Sentiment/sentiment"
 import convertTextToSpeech from "@/Domain/Speech/textToAudio";
+import UserReply from "@/Interfaces/Common/UserReply";
 
 // Initialize the OpenAI client
 const openAIEndPoint = import.meta.env.VITE_AZ_OPENAI_ENDPOINT || "";
@@ -69,7 +69,7 @@ export async function askOpenAI(prompt: string): Promise<string> {
 
 //Parameters: request to send to open AI
 //parameters  isQna boolean
-export async function openAICall(request: string, isQna: boolean): Promise<string> {
+export async function openAICall(request: string, isQna: boolean, userReplies?: UserReply[]): Promise<string> {
 
 	const client = new OpenAIClient(
 		openAIEndPoint,
@@ -77,9 +77,9 @@ export async function openAICall(request: string, isQna: boolean): Promise<strin
 	);
 
 	// Craft the considerate prompt (reformatSystemPrompt(prompt) should be defined elsewhere)
-	const consideratePrompt = (isQna) ? reformatQnaMessage(prompt) : reformatSystemMessage(prompt);
+	const consideratePrompt = (isQna) ? reformatQnaMessage(request) : reformatSystemMessage(request, userReplies!);
 
-
+	console.log("openAI");
 	const result = await client.getChatCompletions(openAIDeployment, [
 		{ role: "system", content: systemMessage },
 		{ role: "user", content: "Can you help me?" },
@@ -87,7 +87,7 @@ export async function openAICall(request: string, isQna: boolean): Promise<strin
 		{ role: "user", content: consideratePrompt },
 	]);
 
-	return result.choices[0].message.content;
+	return result.choices[0].message!.content!;
 }
 
 export async function chatWithOpenAI(): Promise<void> {

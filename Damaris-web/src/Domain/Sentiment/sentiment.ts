@@ -1,3 +1,4 @@
+import UserReply from "@/Interfaces/Common/UserReply";
 import { UserRepliesContext } from "@/main";
 import {useContext} from "react";
 
@@ -24,8 +25,8 @@ const sentimentToTone: Record<number, string> = {
 };
 
 
-export function getGeneralUserSentiment(): string {
-	const overallSentiment = computeOverallSentiment();
+export function getGeneralUserSentiment(userReplies: UserReply[]): string {
+	const overallSentiment = computeOverallSentiment(userReplies);
 	if (overallSentiment === null) {
 		return "Neutral"; // Default to Neutral if no data
 	}
@@ -33,14 +34,13 @@ export function getGeneralUserSentiment(): string {
 	return userTone;
 }
 
-export function computeOverallSentiment(): number | null {
-	const userRepliesContent = useContext(UserRepliesContext);
+export function computeOverallSentiment(userReplies: UserReply[]): number | null {
 
-	if (userRepliesContent?.userReplies.length === 0) {
+	if (userReplies?.length === 0) {
 		return 6;
 	}
 
-	const userReplyList = userRepliesContent?.userReplies;
+	const userReplyList = userReplies;
 
 	const userReplyListLength = userReplyList?.length ?? 0;
 	// Calculate the average sentiment score
@@ -57,8 +57,8 @@ export function computeOverallSentiment(): number | null {
 
 
 //Use to improve System Replies and questions to the user.
-export function reformatSystemMessage(request: string): string {
-	const userTone = getGeneralUserSentiment();
+export function reformatSystemMessage(request: string, userReplies: UserReply[]): string {
+	const userTone = getGeneralUserSentiment(userReplies);
 
 	const prompt = `        
         recreate the message below to engage a customer who is` +  userTone + `.` +  `
