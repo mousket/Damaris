@@ -46,7 +46,7 @@ configure(): void {
     currentNode.setNextPrompt(
         new Input<string>(
             "cityTown",
-            "A prompt to ask for city or town",
+            "What is the city",
             this.item.fromAddress.cityTown,
             (value: string) => {
                 this.item.fromAddress.cityTown = value;
@@ -59,7 +59,7 @@ configure(): void {
     currentNode.setNextPrompt(
         new Input<string>(
             "company",
-            "A prompt to ask for the company",
+            "what is the company",
             this.item.fromAddress.company,
             (value: string) => {
                 this.item.fromAddress.company = value;
@@ -72,7 +72,7 @@ configure(): void {
     currentNode.setNextPrompt(
         new Input<string>(
             "email",
-            "A prompt to ask for the user's email",
+            "what is the receiver's email",
             this.item.fromAddress.email,
             (value: string) => {
                 this.item.fromAddress.email = value;
@@ -85,7 +85,7 @@ configure(): void {
     currentNode.setNextPrompt(
         new Input<string>(
             "name",
-            "A prompt to ask for the receiver name",
+            "What is the receiver name",
             this.item.fromAddress.name,
             (value: string) => {
                 this.item.fromAddress.name = value;
@@ -98,7 +98,7 @@ configure(): void {
     currentNode.setNextPrompt(
         new Input<string>(
             "phone",
-            "A prompt to ask for phone number",
+            "What is the receiver phone number",
             this.item.fromAddress.phone,
             (value: string) => {
                 this.item.fromAddress.phone = value;
@@ -111,7 +111,7 @@ configure(): void {
     currentNode.setNextPrompt(
         new Input<string>(
             "postalCode",
-            "A prompt to ask for the postal code",
+            "what is the postal code",
             this.item.fromAddress.phone,
             (value: string) => {
                 this.item.fromAddress.phone = value;
@@ -124,7 +124,7 @@ configure(): void {
     currentNode.setNextPrompt(
         new Input<string>(
             "statProvince",
-            "A prompt to ask for the state",
+            "what is the state",
             this.item.fromAddress.phone,
             (value: string) => {
                 this.item.fromAddress.phone = value;
@@ -137,7 +137,7 @@ configure(): void {
     currentNode.setNextPrompt(
         new Input<string>(
             "residential",
-            "A prompt to ask if it's a residential address",
+            "what is the residential address",
             this.item.fromAddress.phone,
             (value: string) => {
                 this.item.fromAddress.phone = value;
