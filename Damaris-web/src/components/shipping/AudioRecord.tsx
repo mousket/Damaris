@@ -30,10 +30,16 @@ const AudioRecord = ({
 			if (handlePrompt && handlePrompt.prompt) {
 				const prompt = await openAICall(handlePrompt.prompt, false)
 				setText(prompt);
+				setAiState(AiState.IS_SPEAKING);
 				await convertTextToSpeech(prompt);
-				if(!handlePrompt.waitForResponse) {
-					handlePrompt.handleResponse();
-				}
+				setIsTalking(true);
+				setTimeout(() => {
+					setIsTalking(false);
+					setAiState(AiState.NONE);
+					if(!handlePrompt.waitForResponse) {
+						handlePrompt.handleResponse();
+					}
+				}, prompt.split(" ").length * 400)
 			}
 		}
 		if(handlePrompt) {
