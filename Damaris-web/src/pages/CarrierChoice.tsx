@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 import type { RateDetails, RateResponse } from "@/API/Shipment/rate";
 import {
 	Card,
@@ -26,13 +26,13 @@ const CarrierChoice = () => {
 					the most benefits
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="grid gap-4 overflow-scroll">
+			<CardContent className="grid gap-4 sm:grid-cols-2 overflow-scroll">
 				{res.rates.map((rate, index) => (
 					<Button
 						className="overflow-scroll h-full w-full bg-white hover:bg-gray-300"
 						onClick={() =>
 							Swal.fire({
-								title: `You chose ${rate.carrier} for your shipping`,
+								title: `You chose a good ${rate.carrier} plan!!!`,
 								text: "You made an excelent choice for your shipping. Please visit us more often",
 								icon: "success",
 							})
