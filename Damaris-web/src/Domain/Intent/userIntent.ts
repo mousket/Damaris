@@ -4,6 +4,8 @@ import {
 	AzureKeyCredential,
 } from "@azure/ai-language-conversations";
 import { NavigateFunction } from "react-router-dom";
+import {openAICall} from "@/Domain/AzureOpenAI/openAI";
+import convertTextToSpeech from "@/Domain/Speech/textToAudio";
 
 // Analyze the user input
 async function analyzeUserInputForDamarisIntent(
@@ -45,6 +47,7 @@ async function analyzeUserInputForDamarisIntent(
 
 		// Extract relevant information from the result
 		const topIntent = result.result.prediction.topIntent;
+		let systemReply;
 		console.log("Top intent:", topIntent);
 
 		// Handle different intents (shipping, tracking, etc.) based on user input
@@ -66,8 +69,9 @@ async function analyzeUserInputForDamarisIntent(
 				break;
 			case "GetShippingInformation":
 				// Implement logic for getting information about shipment in general.
-				console.log("Handling tracking intent...");
-				navigate("/carrierchoice");
+				console.log("Handling Questions From the Customers intent...");
+				systemReply = await openAICall(text, true);
+				await convertTextToSpeech(systemReply);
 				break;
 			case "GetShippingLabel":
 				// Implement logic for getting a shipping label for a shipment.
@@ -79,8 +83,18 @@ async function analyzeUserInputForDamarisIntent(
 				console.log("Handling tracking intent...");
 				navigate("/carrierchoice");
 				break;
+			case "QnaIntent":
+				// Implement logic for  a shipment based on the provided tracking number.
+				console.log("Handling Questions From the Customers intent...");
+				systemReply = await openAICall(text, true);
+				await convertTextToSpeech(systemReply);
+				break;
 			default:
-				console.log("Unknown intent:", topIntent);
+				// Implement logic for  a shipment based on the provided tracking number.
+				console.log("Handling Questions From the Customers intent...");
+				systemReply = await openAICall(text, true);
+				await convertTextToSpeech(systemReply);
+				break;
 		}
 	} catch (error) {
 		console.error("Error analyzing user input:", error);
